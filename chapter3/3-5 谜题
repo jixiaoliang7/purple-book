@@ -1,0 +1,92 @@
+#include<cstdio>
+#include<cstring>
+#include<cctype>
+int main() {
+	int cnt = 1;
+	while (true) {
+		int answer = 1;
+		char f;
+		f = getchar();
+		if (f == 'Z') break;
+		else {
+			char matrix[6][6];
+			int space_coor[2] = { 0,0 };
+			matrix[0][0] = f;
+			char a;
+			for (int k = 1; k != 6; ++k) {
+				a = getchar();
+				if (a != ' ') matrix[0][k] = a;
+				else 
+					space_coor[1] = k;
+			}
+			for (int i = 1; i != 5; ++i)
+				for (int j = 0; j != 6; ++j) {
+					a = getchar();
+					if (a != ' ')  matrix[i][j] = a;
+					else {
+						space_coor[0] = i; space_coor[1] = j;
+					}
+				}
+			char c;
+			while (c = getchar()) {
+				if (c == '0') {
+					c = getchar();
+					break;
+				}
+				else if (c=='\n') continue;
+				else
+					switch (c) {
+					case 'A':
+						if (space_coor[0] == 0) answer = 0;
+						else {
+							char t = matrix[space_coor[0] - 1][space_coor[1]];
+							matrix[space_coor[0]][space_coor[1]] = t;
+							matrix[space_coor[0] - 1][space_coor[1]] = ' ';
+							--space_coor[0];
+						}
+						break;
+					case 'B':
+						if (space_coor[0] == 4) answer = 0;
+						else {
+							char t = matrix[space_coor[0] + 1][space_coor[1]];
+							matrix[space_coor[0]][space_coor[1]] = t;
+							matrix[space_coor[0] + 1][space_coor[1]] = ' ';
+							++space_coor[0];
+						}
+						break;
+					case 'L':
+						if (space_coor[1] == 0) answer = 0;
+						else {
+							char t = matrix[space_coor[0]][space_coor[1]-1];
+							matrix[space_coor[0]][space_coor[1]] = t;
+							matrix[space_coor[0]][space_coor[1]-1] = ' ';
+							--space_coor[1];
+						}
+						break;
+					case 'R':
+						if (space_coor[1] == 4) answer = 0;
+						else {
+							char t = matrix[space_coor[0]][space_coor[1]+1];
+							matrix[space_coor[0]][space_coor[1]] = t;
+							matrix[space_coor[0]][space_coor[1]+1] = ' ';
+							++space_coor[1];
+						}
+						break;
+					}
+			}
+			printf("Puzzle #%d:\n", cnt);
+			if (answer == 0) printf("This puzzle has no final configuration.\n");
+			else {
+				for (int i = 0; i <= 4; ++i)
+				{
+					for (int j = 0; j <= 3; ++j)
+						printf("%c ", matrix[i][j]);
+					printf("%c\n", matrix[i][4]);
+				}
+			}
+		}
+		printf("\n");
+		++cnt;
+	}
+	return 0;
+}
