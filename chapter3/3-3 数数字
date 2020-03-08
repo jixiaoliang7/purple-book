@@ -1,0 +1,16 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include<cstdio>
+#include<math.h>
+#include<cstring>
+#include<cctype>
+char s[10005];
+int main() {
+	int cnt[20] = { 0 };
+	scanf("%s", s);
+	for (int i = 0; i != strlen(s); ++i)
+		++cnt[s[i] - '0'];
+	for (int j = 0; j <= 9; ++j)
+		printf("%d ", cnt[j]);
+	printf("\n");
+	return 0;
+}
