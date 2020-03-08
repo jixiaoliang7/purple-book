@@ -1,0 +1,20 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include<cstdio>
+#include<math.h>
+#include<cstring>
+int main() {
+	char s[85];
+	scanf("%s", s);
+	int cnt = 0;
+	int S = 0;
+	for (int i = 0; i != strlen(s); ++i)
+	{
+		if (s[i] == 'O') {
+			S += ++cnt;
+		}
+		else
+			cnt = 0;
+	}
+	printf("%d", S);
+	return 0;
+}
