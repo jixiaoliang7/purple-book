@@ -1,0 +1,60 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include<cstdio>
+#include<cstring>
+#include<cctype>
+#include<string>
+#include<iostream>
+using std::string; using std::cin; using std::cout; using std::endl;
+int s[3005];
+int main() {
+	int a, b;
+	int cnt = 1;
+	while (cin >> a >> b) {
+		int value[3005];
+		int m = a;
+		int gap = 0;
+		int first;
+		s[0] = m / b;
+		m = 10 * (m - s[0] * b);
+		for (int i = 1; i <= 3000; ++i) {
+			if (gap) break;
+			for (int j = 1; j <= i; ++j) {
+				if (value[j] == m) { gap = i - j; first = j; break; }
+			}
+			value[i] = m;
+			int n = m / b;
+			s[i] = n;
+			m = 10 * (m - n * b);
+		}
+		cout << a << '/' << b << " = "<<s[0]<<'.';
+		if (first + gap >= 51) {
+			if (first == 1) {
+				cout << '(';
+				for (int i = 1; i <= 50; ++i) cout << s[i];
+				cout << '.' << '.' << '.' << ')' << endl;
+			}
+			else {
+				for (int i = 1; i <= first - 1; ++i) cout << s[i];
+				cout << '(';
+				for (int i = first; i <= 50; ++i)cout << s[i];
+				cout << '.' << '.' << '.' << ')' << endl;
+			}
+		}
+		else {
+			if (first == 1) {
+				cout << '(';
+				for (int i = 1; i <= gap; ++i) cout << s[i];
+				cout << ')' << endl;
+			}
+			else {
+				for (int i = 1; i <= first - 1; ++i)cout << s[i];
+				cout << '(';
+				for (int i = first; i <= first + gap - 1; ++i) cout << s[i];
+				cout << ')' << endl;
+			}
+		}
+		cout << ' ' << ' ' << ' ' << gap << " = " << "number of digits in repeating cycle" << endl;
+		cout << endl;
+	}
+	return 0;
+}
