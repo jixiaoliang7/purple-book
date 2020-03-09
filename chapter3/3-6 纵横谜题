@@ -1,0 +1,53 @@
+#include<cstdio>
+#include<cstring>
+#include<cctype>
+char s[11][12];
+int num[11][12];
+int main() {
+	int cnt = 1;
+	while (true) {
+		int r, c;
+		char a, b;
+		a = getchar();
+		if (a == '0') break;
+		getchar();
+		b = getchar();
+		getchar();
+		r = a - '0';
+		c = b - '0';
+		int numcnt = 1;
+		for (int i = 0; i <= r - 1; ++i) 
+			for (int j = 0; j <= c; ++j) {
+				char c;
+				c = getchar();
+				if (c == '\n') continue;
+				s[i][j] = c;
+				if (c == '*') continue;
+				if (i == 0 || j == 0 || s[i - 1][j] == '*' || s[i][j - 1] == '*') {
+					num[i][j] = numcnt;
+					++numcnt;
+					continue;
+				}
+			}
+		if (cnt != 1) printf("\n");
+		printf("Puzzle #%d:\n", cnt);
+		printf("Across\n");
+		for (int i = 0; i <= r - 1; ++i) 
+			for (int j = 0; j <= c - 1; ++j) 
+				if (s[i][j] !='*'&&(j == 0 || s[i][j - 1] == '*')) {
+						printf("%3d.", num[i][j]);
+						for (int k = j; k <= c - 1 && s[i][k] != '*'; ++k) printf("%c", s[i][k]);
+						printf("\n");
+					}
+		printf("Down\n");
+		for (int i = 0; i <= r - 1; ++i) 
+			for (int j = 0; j <= c - 1; ++j) 
+				if(s[i][j] !='*'&&(i==0||s[i-1][j] =='*')){
+					printf("%3d.", num[i][j]);
+					for (int k = i; k<=r-1&&s[k][j]!='*'; ++k) printf("%c", s[k][j]);
+					printf("\n");
+				}
+		++cnt;
+	}
+	return 0;
+}
