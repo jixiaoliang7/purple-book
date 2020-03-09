@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include<cstdio>
 #include<cstring>
 #include<cctype>
@@ -7,14 +8,29 @@ int main() {
 	int cnt = 1;
 	while (true) {
 		int r, c;
-		char a, b;
+		char a, b,d,e;
 		a = getchar();
 		if (a == '0') break;
-		getchar();
+		d = getchar();
+		if (a == '1') {
+			if (d != ' ') {
+				r = 10;
+				getchar();
+			}
+			else r = 1;
+		}
+		else
+			r = a - '0';
 		b = getchar();
-		getchar();
-		r = a - '0';
-		c = b - '0';
+		e = getchar();
+		if (b == '1') {
+			if (e == '0') {
+				c = 10;
+				getchar();
+			}
+			else c = 1;
+		}
+		else c = b - '0';
 		int numcnt = 1;
 		for (int i = 0; i <= r - 1; ++i) 
 			for (int j = 0; j <= c; ++j) {
@@ -30,7 +46,7 @@ int main() {
 				}
 			}
 		if (cnt != 1) printf("\n");
-		printf("Puzzle #%d:\n", cnt);
+		printf("puzzle #%d:\n", cnt);
 		printf("Across\n");
 		for (int i = 0; i <= r - 1; ++i) 
 			for (int j = 0; j <= c - 1; ++j) 
