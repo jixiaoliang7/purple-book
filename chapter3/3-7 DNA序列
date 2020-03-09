@@ -1,0 +1,48 @@
+#include<cstdio>
+#include<cstring>
+#include<cctype>
+#include<string>
+#include<iostream>
+using std::string; using std::cin;
+string s[50];
+int main() {
+	int cnt;
+	scanf("%d", &cnt);
+	while (cnt) {
+		int distance = 0;
+		int m, n;
+		scanf("%d%d", &m, &n);
+		getchar();
+		for (int k = 0; k <= m - 1; ++k) cin >> s[k];
+		for (int i=0;i<=n-1;++i){
+			int tcnt = 0;
+			int acnt = 0;
+			int ccnt = 0;
+			int gcnt = 0;
+			for (int j = 0; j <= m - 1; ++j)
+			{
+				switch (s[j][i]) {
+				case 'A':++acnt; break;
+				case 'C':++ccnt; break;
+				case 'G':++gcnt; break;
+				case 'T':++tcnt; break;
+				}
+			}
+			char max;
+			int num = acnt;
+			if (acnt >= ccnt) max = 'A';
+			else { max = 'C'; num = ccnt; }
+			if (num < gcnt) {
+				max = 'G'; num = gcnt;
+			}
+			if (num < tcnt) {
+				max = 'T'; num = tcnt;
+			}
+			printf("%c", max);
+			distance += (m-num);
+			}
+		printf("\n%d\n", distance);
+		--cnt;
+	}
+	return 0;
+}
