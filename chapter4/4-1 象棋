@@ -1,0 +1,169 @@
+#include<cstdio>
+#include<cstring>
+#include<cctype>
+#include<string>
+#include<iostream>
+#include<vector>
+#include<cmath>
+using std::string; using std::cin; using std::cout; using std::endl; using std::vector;
+int N;
+int list[10][3];
+bool can_move(int z) {
+	switch (z) {
+	case 1: { if (list[0][0] == 1) return false;
+		  else return true; }
+	case 2:{if (list[0][0] == 3) return false;
+		  else return true;
+	}
+	case 3: {if (list[0][1] == 4) return false;
+		  else return true; }
+	case 4: {if (list[0][1] == 6) return false;
+		  else return true; }
+	}
+	return false;
+}
+bool can_car(int x, int y) {
+	if ((x == list[0][0]) && (y == list[0][1])) return false;
+	else if (x == list[0][0]) {
+		for (int i = 1; i <= N; ++i) {
+			if (list[i][0] == x) {
+				if ((list[i][1] - y) * (list[i][1] - list[0][1]) < 0) return false;
+			}
+			else continue;
+		}
+		return true;
+	}
+	else if (y == list[0][1]) {
+		for (int i = 1; i <= N; ++i) {
+			if (list[i][1] == y) {
+				if ((list[i][0] - x) * (list[i][0] - list[0][0]) < 0) return false;
+			}
+			else continue;
+		}
+		return true;
+	}
+	else
+		return false;
+}
+bool can_horse(int x, int y) {
+	int dx = x - list[0][0];
+	int dy = y - list[0][1];
+	if (hypot(dx, dy) == hypot(1, 2)) {
+		for (int i = 1; i <= N; ++i) {
+			if ((hypot(x - list[i][0], y - list[i][1]) == hypot(1, 0)) && (hypot(list[0][0] - list[i][0], list[0][1] - list[i][1]) == hypot(1, 1)))
+				return false;
+		}
+		return true;
+	}
+	else 
+		return false;
+}
+bool can_pao(int x, int y) {
+	int gap = 0;
+	if (x == list[0][0] && y == list[0][1]) return false;
+	else if (x == list[0][0]) 
+		for (int i = 1; i <= N; ++i) {
+			if (list[i][0] == x) { if ((list[i][1] - y) * (list[i][1] - list[0][1]) < 0) gap++; }
+		}
+	else if (y == list[0][1]) 
+		for (int i = 1; i <= N; ++i) {
+			if (list[i][1] == y){if ((list[i][0] - x) * (list[i][0] - list[0][0]) < 0) gap++; }
+		}
+	{
+		if (gap == 1)return true;
+		else return false; }
+}
+bool can_general(int x, int y) {
+	if(y == list[0][1]) {
+		for (int i = 1; i <= N; ++i) {
+			if (list[i][1] == y) {
+				if ((list[i][0] - x) * (list[i][0] - list[0][0]) < 0) return false;
+			}
+			else continue;
+		}
+		return true;
+	}
+	else return false;
+}
+bool is_death() {
+	int cnt = 0;
+	for (int i = 1; i <= N; ++i) {
+		switch (list[i][2]) {
+		case 0:{if (can_general(list[i][0], list[i][1])) {
+			cnt += 1;
+			break;
+		}
+			  else break;
+		}
+		case 1:{if (can_car(list[i][0], list[i][1])) {
+			cnt += 1;
+			break;
+		}
+			  else break;
+		}
+		case 2:{if (can_horse(list[i][0], list[i][1])) {
+			cnt += 1;
+			break;
+		}
+			  else break;
+		}
+		case 3: {if (can_pao(list[i][0], list[i][1])) {
+			cnt += 1;
+			break;
+		}
+			  else break; }
+		default:
+			break;
+		}
+	}
+	if (cnt) return true;
+	else return false;
+}
+
+int main() {
+	while (true) {
+		int answer = 0;
+		cin >> N;
+		if (N == 0) break;
+		int x2=0;
+		int y2 = 0;
+		cin >> x2 >> y2;
+		for (int i = 1; i <= N; ++i)
+		{
+			char a;
+			int x, y;
+			cin >> a >> x >> y;
+			list[i][0] = x;
+			list[i][1] = y;
+			switch (a) {
+			case 'G':list[i][2]=0; break;
+			case 'R':list[i][2] = 1; break;
+			case 'H':list[i][2] = 2; break;
+			case 'C':list[i][2] = 3; break;
+			}
+		}
+		list[0][0] = x2;
+		list[0][1] = y2;
+		for (int j = 1; j <= 4; ++j) {
+			if (can_move(j) == 1) {
+				if (j == 1) list[0][0]--;
+				if (j == 2)list[0][0]++;
+				if (j == 3)list[0][1]--;
+				if (j == 4)list[0][1]++;
+				{
+					if (is_death() == 0) { answer = 1; break; }
+					else {
+						list[0][0] = x2;
+						list[0][1] = y2;
+					}
+				}
+			}
+		}
+		if (answer == 1) { cout << "NO" << endl; }
+		else { cout << "YES" << endl; }
+		for (int i = 0; i <= N; ++i) 
+			for (int j = 0; j <= 2; ++j)
+				list[i][j] = 0;
+	}
+	return 0;
+}
