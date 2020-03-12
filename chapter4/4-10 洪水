@@ -1,0 +1,40 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include<cstdio>
+#include<cctype>
+#include<string>
+#include<iostream>
+#include<cmath>
+#include<iterator>
+#include<algorithm>
+using namespace std;
+long N, n, m,tier, volume, v0, high;
+int cnt = 1;
+int list[901];
+long double altitude,percentage;
+int main() {
+	while (true) {
+		int answer = 0;
+		cin >> n >> m;
+		if (n == 0) break;
+		N = n * m;
+		for (int i = 0; i <= N-1; ++i) cin >> list[i];
+		cin >> volume;
+		sort(list, list+N);
+		for (int i = 0; i <= N - 2; ++i) {
+			high = list[i + 1] - list[i];
+			if (high == 0) continue;
+			int j = 100 * (i + 1);
+			v0 = j * high;
+			if (volume > v0) volume -= v0;
+			else if (volume == v0) { altitude = list[i + 1]; tier = i + 1; answer = 1; break; }
+			else { tier = i + 1;  altitude = list[i]*1.0 + volume/(100.0*(i+1)); answer = 1; break; }
+		}
+		if (answer ==0) { altitude = list[N-1] + volume / (100.0 * N); tier = N; }
+		percentage = ((tier * 1.0) / N) * 100;
+		printf("Region %d\n", cnt);
+		printf("Water level is %.2llf meters.\n", altitude);
+		printf("%.2llf percent of the region is under water.\n\n", percentage);
+		++cnt;
+	}
+	return 0;
+}
