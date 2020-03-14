@@ -1,0 +1,48 @@
+#include<cstdio>
+#include<cctype>
+#include<string>
+#include<map>
+#include<iostream>
+#include<set>
+#include <vector>
+#include<algorithm>
+#include<iomanip>
+using namespace std;
+int n, m,r1,r2,c1,c2;
+map<string,int> list;
+string contain[10000][12];
+map <vector<int>, int> table;
+int main() {
+	while (cin>>n>>m) {
+		getchar();
+		int cnt = 0;
+		r1 = -1; r2 = -1; c1 = -1; c2 = -1;
+		for (int i = 0; i <= n - 1; ++i) {
+			int j = 0;
+			string s;
+			while (true) {
+				char c = getchar();
+				if (c == ',') { list[s] = cnt++; contain[i][j] = s; j++; s.clear(); continue; }
+				if (c == '\n') { list[s] = cnt++; contain[i][j] = s; break; }
+				else s.push_back(c);
+			}
+		}
+		for (int j = 0; j <= m - 2; ++j) {
+			for (int k = j + 1; k <= m - 1; ++k) {
+				for (int i = 0; i <= n - 1; ++i) {
+					int m1 = list[contain[i][j]];
+					int m2 = list[contain[i][k]];
+					vector<int> vec{ m1,m2 };
+					if (table.count(vec) == 1) { c1 = j; c2 = k; r1 = table[vec]; r2 = i; break; }
+					else table[vec] = i;
+				}
+				table.clear();
+				if (c1 != -1) break;
+			}
+			if (c1 != -1)break;
+		}
+		if (c1 == -1) cout << "YES" << endl;
+		else cout << "NO" << endl << r1+1 << " " << r2+1 << endl << c1+1 << " " << c2+1 << endl;
+	}
+	return 0;
+}
