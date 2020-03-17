@@ -1,0 +1,36 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include<cstdio>
+#include<cctype>
+#include<string>
+#include<cstring>
+#include<vector>
+#include<iterator>
+#include<iostream>
+#include<algorithm>
+#include<sstream>
+#include <queue>
+#include<iomanip>
+#include<map>
+#include<cstdlib>
+using namespace std;
+int main() {
+	int n;
+	while (cin >> n) {
+		if (n == 0) break;
+		queue<int> q;
+		for (int i = 1; i <= n; ++i) q.push(i);
+		cout << "Discarded cards: ";
+		while (q.size() != 1) {
+			int out = q.front();
+			if (q.size() != n) cout << ", ";
+			cout << out;
+			q.pop();
+			int j = q.front();
+			q.pop();
+			q.push(j);
+		}
+		cout << endl;
+		cout << "Remaining card: " << q.front() << endl;
+	}
+	return 0;
+}
