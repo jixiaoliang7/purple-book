@@ -1,0 +1,283 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include<cstdio>
+#include<cctype>
+#include<string>
+#include<vector>
+#include<iterator>
+#include<iostream>
+#include<algorithm>
+#include<iomanip>
+using namespace std;
+int N, n,cnt;
+struct Item {
+	string name;
+	int first_two=0;
+	int total = 1000;
+	int signal = 0;
+	int same_person = 1;
+	int same_money = 0;
+	int money_cnt=0;
+	int place=0;
+	double money = 0.0;
+	vector<int> point;
+	int first_three=0;
+	bool operator < (const Item& other) const {
+		if (point.size() != other.point.size()) return point.size() > other.point.size();
+		else {
+			if (point.size() == 4) {
+				if (total != other.total) return total < other.total;
+				else return name < other.name;
+			}
+			else if (point.size() == 3) {
+				if (first_three != other.first_three) return first_three < other.first_three;
+				else return name < other.name;
+			}
+			else if (point.size() == 2) {
+				if (first_two != other.first_two) return first_two < other.first_two;
+				else return name < other.name;
+			}
+			else if (point.size() == 1) {
+				if (point[0] != other.point[0]) return point[0] < other.point[0];
+				else return name < other.name;
+			}
+			else return name < other.name;
+		}
+	}
+};
+vector<int> list;
+vector<struct Item> temp;
+vector<struct Item> finally_list;
+double prize[75];
+int first_two() {
+	sort(list.begin(), list.end());
+	if (list.size() >= 70) 
+		return list[69];
+	else
+		return list[list.size() - 1];
+}
+void read_input() {
+	getchar();
+	for (int i = 0; i <= 70; ++i) { double f; cin >> f; prize[i] = f; getchar(); }
+	cin >> n;
+	getchar();
+	for (int i = 1; i <= n; ++i) {
+		struct Item item;
+		string s0;
+		int signal = 0;
+		for (int j = 1; j <= 20; ++j) {
+			char c;
+			c = getchar();
+			if (c == '*') signal = 1;
+			s0.push_back(c);
+		}
+		item.signal = signal;
+		item.name = s0;
+		int abandon = 0;
+		for (int i = 1; i <= 2; ++i) {
+			string points;
+			cin >> points;
+			if (points == "DQ") { getchar(); abandon = 1; break; }
+			if (points.size() == 2) {
+				int real_point = (points[0] - '0') * 10 + points[1] - '0';
+				item.point.push_back(real_point);
+			}
+			else if (points.size() == 3) {
+				int real_point = (points[0] - '0') * 100 + (points[1] - '0') * 10 + (points[2] - '0');
+				item.point.push_back(real_point);
+			}
+			else if (points.size() == 1) {
+				int real_point = (points[0] - '0');
+				item.point.push_back(real_point);
+			}
+		}
+		if (abandon == 1) {
+			continue; 
+		}
+			item.first_two = item.point[0] + item.point[1];
+			for (int j = 1; j <= 2; ++j) {
+				string points;
+				cin >> points;
+				if (points == "DQ") { item.signal = 2; break; }
+				if (points.size() ==2) {
+					int real_point = (points[0] - '0') * 10 + points[1] - '0';
+					item.point.push_back(real_point);
+				}
+				else if (points.size() == 3) {
+					int real_point = (points[0] - '0') * 100 + (points[1] - '0') * 10 + (points[2] - '0');
+					item.point.push_back(real_point);
+				}
+				else if (points.size() == 1) {
+					int real_point = (points[0] - '0');
+					item.point.push_back(real_point);
+				}
+			}
+				getchar();
+				if (item.signal != 2) { item.total = item.point[0] + item.point[1] + item.point[2] + item.point[3]; }
+				else {
+					if (item.point.size() == 3) item.first_three = item.point[0] + item.point[1] + item.point[2];
+				}
+				list.push_back(item.first_two);
+				temp.push_back(item);
+				if (item.signal == 0) item.same_money++;
+			}
+		}
+
+void write_output() {
+	int limit = first_two();
+	for (struct Item item : temp)
+		if (item.first_two <= limit)finally_list.push_back(item);
+	sort(finally_list.begin(), finally_list.end());
+	int money_cnt = 1;
+	int place = 1;
+	int list_size = finally_list.size() - 1;
+	for (int i = 0; i <= list_size; i += 0) {
+		if (finally_list[i].total == 1000) break;
+		finally_list[i].place = place;
+		int total = finally_list[i].total;
+		finally_list[i].money_cnt = money_cnt;
+		if (finally_list[i].signal == 0 && money_cnt <= 70) finally_list[i].same_money = 1;
+		if (i < list_size) {
+			for (int j = i + 1; j <= list_size; ++j) {
+				if (finally_list[j].total == total) {
+					finally_list[i].same_person++;
+					if (finally_list[j].signal == 0&&money_cnt<=70) { finally_list[i].same_money++; }
+					if (j == list_size) {
+						if (finally_list[i].same_money == 0);
+						else if (finally_list[i].same_money == 1) {
+							double money = prize[0] * prize[finally_list[i].money_cnt];
+							finally_list[i].money = money;
+						}
+						else {
+							double ratio = 0.0;
+							for (int m = 1; m <= finally_list[i].same_money; ++m) {
+								if (finally_list[i].money_cnt + m - 1 <= 70)
+									ratio += prize[finally_list[i].money_cnt + m - 1] / finally_list[i].same_money;
+							}
+							double money = prize[0] * ratio;
+							finally_list[i].money = money;
+						}
+						int same = finally_list[i].same_person;
+						if (same == 1) {
+							place += same;
+							money_cnt += finally_list[i].same_money;
+						}
+						else {
+							for (int k = 1; k <= same - 1; ++k)
+							{
+								finally_list[i + k].place = finally_list[i].place;
+								finally_list[i + k].money = finally_list[i].money;
+								finally_list[i + k].money_cnt = finally_list[i].money_cnt;
+								finally_list[i + k].same_money = finally_list[i].same_money;
+								finally_list[i + k].same_person = finally_list[i].same_person;
+							}
+							place += same;
+							money_cnt += finally_list[i].same_money;
+						}
+						i += same;
+						break;
+					}
+				}
+				else {
+					if (finally_list[i].same_money == 0);
+					else if (finally_list[i].same_money == 1) {
+						double money = prize[0] *prize[finally_list[i].money_cnt];
+						finally_list[i].money = money;
+					}
+					else {
+						double ratio = 0.0;
+						for (int m = 1; m <= finally_list[i].same_money; ++m) {
+							if (finally_list[i].money_cnt + m - 1 <= 70)
+								ratio += prize[finally_list[i].money_cnt + m - 1] / finally_list[i].same_money;
+						}
+						long double money = prize[0] * ratio;
+						finally_list[i].money = money;
+					}
+					int same = finally_list[i].same_person;
+					if (same == 1) {
+						place += same;
+						money_cnt += finally_list[i].same_money;
+					}
+					else {
+						for (int k = 1; k <= same - 1; ++k)
+						{
+							finally_list[i + k].place = finally_list[i].place;
+							finally_list[i + k].money = finally_list[i].money;
+							finally_list[i + k].money_cnt = finally_list[i].money_cnt;
+							finally_list[i + k].same_money = finally_list[i].same_money;
+							finally_list[i + k].same_person = finally_list[i].same_person;
+						}
+						place += same;
+						money_cnt += finally_list[i].same_money;
+					}
+					i += same;
+					break;
+				}
+			}
+		}
+		else break;
+	}
+	for (int i = 0; i <= list_size; ++i) {
+		string s0 = finally_list[i].name;
+		vector<int> vec = finally_list[i].point;
+		if (vec.size() == 4) {
+			if (finally_list[i].same_money == 0) cout << s0 << " " << left << setw(10) << finally_list[i].place << left << setw(5) << vec[0]
+				<< left << setw(5) << vec[1] << left << setw(5) << vec[2] << left << setw(5) << vec[3] << left << setw(10) << finally_list[i].total << endl;
+			else if (finally_list[i].same_money == 1 || finally_list[i].signal == 1) {
+				cout << s0 << " " << left << setw(10) << finally_list[i].place << left << setw(5) << vec[0]
+					<< left << setw(5) << vec[1] << left << setw(5) << vec[2] << left << setw(5) << vec[3];
+				if (finally_list[i].signal == 0 && finally_list[i].money_cnt <= 70) {
+					cout << left << setw(10) << finally_list[i].total << '$';
+					printf("%9.2lf\n", finally_list[i].money / 100.0+1e-7);
+				}
+				else cout << finally_list[i].total << endl;
+			}
+			else {
+				cout << s0 << " ";
+				int not_space = 0;
+				int number = finally_list[i].place;
+				if (number <= 9) not_space = 2;
+				else if (number <= 99) not_space = 3;
+				else not_space = 4;
+				cout << number << 'T';
+				for (int i = 1; i <= 10 - not_space; ++i) cout << " ";
+				cout << left << setw(5) << vec[0]
+					<< left << setw(5) << vec[1] << left << setw(5) << vec[2] << left << setw(5) << vec[3];
+				if (finally_list[i].money_cnt <= 70) {
+					cout << left << setw(10) << finally_list[i].total << '$';
+					printf("%9.2lf\n", finally_list[i].money/100.0+1e-7);
+				}
+				else 
+					cout << finally_list[i].total << endl;	
+			}
+		}
+		else {
+			if (vec.size() == 3) {
+				cout << s0 << " " << "          " << left << setw(5) << vec[0]
+					<< left << setw(5) << vec[1] << left << setw(5) << vec[2] << "     " << "DQ" << endl;
+			}
+			if (vec.size() == 2) {
+				cout << s0 << " " << "          " << left << setw(5) << vec[0]
+					<< left << setw(5) << vec[1] << "     " << "     " << "DQ" << endl;
+			}
+		}
+	}
+}
+
+int main() {
+	cin >> N;
+	cnt = 1;
+	getchar();
+	while (cnt <= N) {
+		read_input();
+		cout << "Player Name          " << "Place     " << "RD1  " << "RD2  " << "RD3  " << "RD4  " << "TOTAL     " << "Money Won" << endl;
+		printf("---------------------------------------");
+		printf("--------------------------------\n");
+		write_output();
+		if (cnt != N) cout << endl;
+		++cnt;
+		list.clear();
+		finally_list.clear();
+		temp.clear();
+	}
+	return 0;
+}
