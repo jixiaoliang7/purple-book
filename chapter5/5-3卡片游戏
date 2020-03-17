@@ -19,7 +19,8 @@ int main() {
 		if (n == 0) break;
 		queue<int> q;
 		for (int i = 1; i <= n; ++i) q.push(i);
-		cout << "Discarded cards: ";
+		cout << "Discarded cards:";
+		if (q.size() != 1) cout << " ";
 		while (q.size() != 1) {
 			int out = q.front();
 			if (q.size() != n) cout << ", ";
