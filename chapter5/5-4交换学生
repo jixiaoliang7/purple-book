@@ -1,0 +1,51 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include<cstdio>
+#include<cctype>
+#include<string>
+#include<vector>
+#include<iterator>
+#include<iostream>
+#include<algorithm>
+#include<sstream>
+#include<stack>
+#include <queue>
+#include<iomanip>
+using namespace std;
+vector<int>  array1[500001];
+vector<int>  array2[500001];
+int main() {
+	int n;
+	while (true) {
+		cin >> n;
+		if (n == 0) break;
+		if (n % 2 == 1) {
+			for (int i = 1; i <= n; ++i) {
+				int first, second;
+				cin >> first >> second;
+			}
+			cout << "NO" << endl;
+			continue;
+		}
+		for (int i = 1; i <= n; ++i) {
+			int first, second;
+			cin >> first >> second;
+			array1[i].push_back(first);
+			array2[i].push_back(second);
+			array1[i].push_back(second);
+			array2[i].push_back(first);
+		}
+		sort(array1 + 1, array1 + n + 1);
+		sort(array2 + 1, array2 + n + 1);
+		bool yes = true;
+		for (int i = 1; i <= n; ++i) {
+			if (array1[i] != array2[i]) {
+				 yes = false;
+			}
+			array1[i].clear();
+			array2[i].clear();
+		}
+		if (yes) cout << "YES" << endl;
+		else cout << "NO" << endl;
+	}
+	return 0;
+}
