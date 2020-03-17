@@ -1,0 +1,45 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include<cstdio>
+#include<cctype>
+#include<string>
+#include<cstring>
+#include<vector>
+#include<iterator>
+#include<iostream>
+#include<algorithm>
+#include<sstream>
+#include <queue>
+#include<iomanip>
+using namespace std;
+vector<string> array1[1002];
+priority_queue<int> array2[200];
+int main() {
+	string s0;
+	int cnt = 1;
+	while (getline(cin,s0)) {
+		stringstream ss(s0);
+		string s;
+		int columns = 1;
+		while (ss >> s) {
+			array1[cnt].push_back(s);
+			array2[columns].push(s.size());
+			++columns;
+		}
+		++cnt;
+	}
+	int lines = cnt - 1;
+	for (int i = 1; i <= lines; ++i) {
+		int max_length = array2[1].top();
+		int clm = 1;
+		for (auto str : array1[i]) {
+			if (clm == array1[i].size()) cout << str << endl;
+			else {
+				int length = max_length + 1;
+				cout << left << setw(length) << str;
+				++clm;
+				max_length = array2[clm].top();
+			}
+		}
+	}
+	return 0;
+}
