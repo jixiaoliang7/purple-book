@@ -1,0 +1,36 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include<cstdio>
+#include<cctype>
+#include<string>
+#include<vector>
+#include<iterator>
+#include<iostream>
+#include<algorithm>
+#include<sstream>
+#include<stack>
+#include <queue>
+#include<iomanip>
+#include<set>
+using namespace std;
+set<string> set0;
+int main() {
+	string s0;
+	while (cin >> s0) {
+		set0.insert(s0);
+	}
+	for (auto s : set0) {
+		int len = s.size();
+		if (len >= 2) {
+			for (int i = 1; i <= len; ++i) {
+				string str1;
+				string str2;
+				str1.assign(s, 0, i);
+				str2.assign(s, i, len - i);
+				if (set0.count(str1) && set0.count(str2)) {
+					cout << s << endl; break;
+				}
+			}
+		}
+	}
+	return 0;
+}
