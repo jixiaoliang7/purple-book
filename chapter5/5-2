@@ -1,0 +1,53 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include<cstdio>
+#include<cctype>
+#include<string>
+#include<cstring>
+#include<vector>
+#include<iterator>
+#include<iostream>
+#include<algorithm>
+#include<sstream>
+#include <queue>
+#include<iomanip>
+#include<map>
+#include<cstdlib>
+using namespace std;
+int main() {
+	int T;
+	cin >> T;
+	while (T--) {
+		int n;
+		cin >> n;
+		int k;
+		vector<int> array1[1010];
+		vector<int> vec,vec0;
+		for (int i = 1; i <= n; ++i) {
+			cin >> k; 
+			vec.push_back(k);
+			vec0.push_back(0);
+		}
+		if (vec == vec0) { cout << "ZERO" << endl; continue; }
+		array1[1] = vec;
+		int cnt = 1;
+		int control = 0; 
+		vector<int> vec1;
+		for (int i = 0; i <= n - 2; ++i) vec1.push_back(abs(vec[i] - vec[i + 1]));
+		vec1.push_back(abs(vec[n - 1] - vec[0]));
+		while (true) {
+			if (vec1 == vec0) {
+				cout << "ZERO" << endl; break;
+			}
+			for (int i = 1; i <= cnt; ++i) if (vec1 == array1[i]) {
+				cout << "LOOP" << endl; control = 1; break;
+			}
+			if (control == 1) break;
+			array1[cnt + 1] = vec1;
+			++cnt;
+			int i1 = vec1[0];
+			for (int i = 0; i <= n - 2; ++i) vec1[i] = abs(vec1[i] - vec1[i + 1]);
+			vec1[n - 1] = abs(i1 - vec1[n - 1]);
+			}
+	}
+	return 0;
+}
