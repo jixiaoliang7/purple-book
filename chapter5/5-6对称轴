@@ -1,0 +1,66 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include<cstdio>
+#include<cctype>
+#include<string>
+#include<vector>
+#include<iterator>
+#include<iostream>
+#include<algorithm>
+#include<sstream>
+#include<stack>
+#include <queue>
+#include<iomanip>
+#include<set>
+using namespace std;
+bool cmp1(vector<int> vec1, vector<int> vec2) {
+	if (vec1[0] != vec2[0]) return vec1[0] < vec2[0];
+	return vec1[1] < vec2[1];
+}
+bool cmp2(vector<int> vec1, vector<int> vec2) {
+	if (vec1[0] != vec2[0]) return vec1[0] < vec2[0];
+	return vec1[1] > vec2[1];
+}
+vector<int> array1[1002];
+vector<int> array2[1002];
+int main() {
+	int T;
+	cin >> T;
+	while (T--) {
+		int N;
+		cin >> N;
+		int min_x = 10001;
+		int max_x = -10001;
+		int n = N;
+		bool answer = true;
+		while (n) {
+			int x, y;
+			vector<int> vec;
+			cin >> x >> y;
+			vec.push_back(x);
+			vec.push_back(y);
+			if (x < min_x) min_x = x;
+			if (x > max_x) max_x = x;
+			array1[n] = vec;
+			array2[n] = vec;
+			--n;
+		}
+		int avg_x = min_x + max_x;
+		sort(array1 + 1, array1 + N + 1, cmp1);
+		sort(array2 + 1, array2 + N + 1, cmp2);
+		if (avg_x % 2 == 1) {
+			for (int i = 1; i <= N; ++i) {
+				if ((array1[i][0] + array2[N + 1 - i][0] != avg_x) || (array1[i][1] != array2[N + 1 - i][1]))  answer = false;
+			}
+		}
+		else {
+			int middle = avg_x / 2;
+			for (int i = 1; i <= N; ++i) {
+				if (array1[i][0] == middle && array2[N + 1 - i][0] == middle) continue;
+				if ((array1[i][0] + array2[N + 1 - i][0] != avg_x) || (array1[i][1] != array2[N + 1 - i][1]))  answer = false;
+			}
+		}
+		if (answer) cout << "YES" << endl;
+		else cout << "NO" << endl;
+	}
+	return 0;
+}
