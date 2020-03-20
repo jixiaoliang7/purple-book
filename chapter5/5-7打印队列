@@ -1,0 +1,57 @@
+#include<cstdio>
+#include<cctype>
+#include<string>
+#include<vector>
+#include<iterator>
+#include<iostream>
+#include<algorithm>
+#include<sstream>
+#include<iomanip>
+#include<queue>
+using namespace std;
+int array1[110];
+queue<vector<int> > q;
+bool is_max(int k,int u) {
+	int current_max = array1[u];
+	if (current_max > k) return false;
+	else return true;
+}
+int main() {
+	int T;
+	cin >> T;
+	for (int c = 1; c <= T; ++c) {
+
+		int n, m;
+		cin >> n >> m;
+		int minutes = 0;
+		for (int j = 0; j <= n-1; ++j)
+		{
+			int e;
+			cin >> e;
+			vector<int> vec;
+			vec.push_back(e);
+			if (j == m) vec.push_back(1);
+			else vec.push_back(0);
+			q.push(vec);
+			array1[j] = e;
+		}
+		sort(array1, array1 + n);
+		int position = n-1;
+		while (true) {
+			vector<int> vec = q.front();
+			if (is_max(vec[0],position)) {
+				q.pop();
+				position--;
+				++minutes;
+				if (vec[1] == 1)break;
+			}
+			else {
+				q.pop();
+				q.push(vec);
+			}
+		}
+		cout << minutes << endl;
+		while (!q.empty()) q.pop();
+	}
+	return 0;
+}
