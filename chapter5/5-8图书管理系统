@@ -1,0 +1,137 @@
+#include<cstdio>
+#include<cctype>
+#include<string>
+#include<vector>
+#include<iterator>
+#include<iostream>
+#include<algorithm>
+#include<sstream>
+#include<iomanip>
+#include<queue>
+#include<map>
+using namespace std;
+struct Book {
+	string name;
+	string author;
+	bool operator < (const Book& other) const {
+		if (author != other.author) return author < other.author;
+		else return name < other.name;
+	}
+};
+vector<Book> vec0;
+map<string, Book> map1;
+vector<Book> vec;
+void read_input_book(){
+	while (true) {
+		string name, author;
+		char c;
+		c = getchar();
+		if (c != '"') {
+			getchar();
+			getchar();
+			getchar();
+			break;
+		}
+		name.push_back(c);
+		c = getchar();
+		while (c != '"') {
+			name.push_back(c);
+			c = getchar();
+		}
+		name.push_back(c);
+		getchar();
+		getchar();
+		getchar();
+		getchar();
+		c = getchar();
+		while (c != '\n') {
+			author.push_back(c);
+			c = getchar();
+		}
+		Book book;
+		book.name = name;
+		book.author = author;
+		map1[name] = book;
+		vec.push_back(book);
+	}
+	sort(vec.begin(), vec.end());
+}
+void read_input_operation() {
+	bool control = true;
+	while (true) {
+		char c;
+		c = getchar();
+		switch (c) {
+		case 'B': {
+			for (int i = 1; i <= 6; ++i) getchar();
+			string name;
+			char h;
+			h = getchar();
+			name.push_back(h);
+			h = getchar();
+			name.push_back(h);
+			while (h != '"') {
+				h = getchar();
+				name.push_back(h);
+			}
+			getchar();
+			Book book = map1[name];
+			auto index0 = lower_bound(vec.begin(), vec.end(), book);
+			int index = lower_bound(vec.begin(), vec.end(), book) - vec.begin();
+			vec.erase(index0);
+			break; 
+		}
+		case 'R': {
+			for (int i = 1; i <= 6; ++i) getchar();
+			string name;
+			char h;
+			h = getchar();
+			name.push_back(h);
+			h = getchar();
+			name.push_back(h);
+			while (h != '"') {
+				h = getchar();
+				name.push_back(h);
+			}
+			getchar();
+			Book book = map1[name];
+			vec0.push_back(book);
+			break;
+		}
+		case 'S': {
+			for (int i = 1; i <= 6; ++i) getchar();
+			sort(vec0.begin(), vec0.end());
+			int cnt = 0;
+			int size = vec0.size();
+			while (cnt!=size) {
+				Book book = vec0[cnt];
+				++cnt;
+				auto index0 = lower_bound(vec.begin(), vec.end(), book);
+				int index = lower_bound(vec.begin(), vec.end(), book) - vec.begin();
+				vec.insert(index0, book);
+				cout << "Put " << book.name;
+				if (index == 0) cout << " first" << endl;
+				else {
+					string name0 = vec[index-1].name;
+					cout << " after " << name0 << endl;
+				}
+			}
+			vec0.clear();
+			cout << "END" << endl;
+			break;
+		}
+		case 'E':
+			control = false;
+			getchar();
+			getchar();
+			getchar();
+			break;
+		}
+		if (control == false) break;
+	}
+}
+int main() {
+	read_input_book();
+	read_input_operation();
+	return 0;
+}
