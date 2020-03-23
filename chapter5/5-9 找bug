@@ -1,0 +1,144 @@
+#include<cstdio>
+#include<cctype>
+#include<string>
+#include<vector>
+#include<iterator>
+#include<iostream>
+#include<algorithm>
+#include<sstream>
+#include<iomanip>
+#include<queue>
+#include<map>
+using namespace std;
+map<char, string> map1;
+map<string, string> map2;
+bool dayu(string &size1, string &size2) {
+	if (size1.size() > size2.size()) return true;
+	else if (size1.size() < size2.size()) return false;
+	else {
+		if (size1 > size2) return true;
+		else return false;
+	}
+}
+string get_number(string &s) {
+	string ss;
+	string name;
+	int size = s.size();
+	bool alnum = true;
+	ss.assign(s, 2, size - 3);
+	for (auto c : ss) if (!isdigit(c))alnum = false;
+	if (alnum) {
+		if (map2.count(s) == 1) return map2[s];
+		else return"-1";
+	}
+	else {
+		string number = get_number(ss);
+		s.replace(2, size - 3, number);
+		if (map2.count(s) == 1) return map2[s];
+		else return "-1";
+	}
+}
+bool decleration(string &s1) {
+	int size = s1.size(); 
+	string s0;
+	bool alnum = true;
+	char name = s1[0];
+	for (int j = 2; j <= size - 2; ++j) {
+		s0.push_back(s1[j]);
+		if (!isdigit(s1[j])) alnum = false;
+	}
+	if (alnum) {
+		map1[name] = s0; return true;
+	}
+	else {
+		string number = get_number(s0);
+		if (number == "-1") return false;
+		else {
+			map1[name] = number; return true;
+		}
+	}
+}
+bool assignment(string &s1,string &s2) {
+	char name = s1[0];
+	if (map1.count(name) == 0) return false;
+	else {
+		string size1 = map1[name];
+		string size2;
+		bool alnum = true;
+		for (int i = 2; i <= s1.size() - 2; ++i)
+			if (!isdigit(s1[i])) alnum = false;
+		if (alnum) size2.assign(s1, 2, s1.size() - 3);
+		else {
+			string number;
+			number.assign(s1, 2, s1.size() - 3);
+			size2 = get_number(number);
+			if (size2 == "-1") return false;
+		}
+		if (dayu(size1, size2));
+		else return false;
+		s1.replace(2, s1.size() - 3, size2);
+		alnum = true;
+		for (auto c : s2) if (!isdigit(c))alnum = false;
+		if (alnum) map2[s1] = s2;
+		else {
+			string num = get_number(s2);
+			if (num == "-1")return false;
+			else map2[s1] = num;
+		}
+	}
+	return true;
+}
+bool read_line(int &cnt,int &row) {
+	string s1;
+	int control = 0;
+	while (true) {
+		char c;
+		c = getchar();
+		if (c == '.') {
+			map1.clear();
+			map2.clear();
+			cnt = -1;
+			++row;
+			getchar();
+			return false;
+		}
+		row = 0;
+		if (c == '\n') { control = 1; break; }
+		if (c == '=') { control = 2; break; }
+		s1.push_back(c);
+	}
+	if (control == 1) {
+		if (decleration(s1)) return true;
+		else return false;
+	}
+	if (control == 2) {
+		string s2;
+		while (true) {
+			char c;
+			c = getchar();
+			if (c == '\n') break;
+			s2.push_back(c);
+		}
+		if (assignment(s1, s2)) return true;
+		else return false;
+	}
+}
+int main() {
+	int row = 0;
+	while (true) {
+		int cnt = 0;
+		int line = 0;
+		int out = 0;
+		while (true) {
+			++line;
+			if (read_line(cnt,row)==false){
+				if (cnt == -1)break;
+				cnt++;
+				if (cnt == 1) out = line;
+			}
+		}
+		if (row == 2)break;
+		cout << out << endl;
+	}
+	return 0;
+}
