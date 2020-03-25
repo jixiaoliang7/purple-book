@@ -1,0 +1,170 @@
+#include<cstdio>
+#include<cctype>
+#include<string>
+#include<vector>
+#include<iterator>
+#include<iostream>
+#include<algorithm>
+#include<sstream>
+#include<iomanip>
+#include<queue>
+#include<map>
+#include<set>
+using namespace std;
+set<string> exclude = { "the","a","to","and","or","not" };
+map<string, vector<vector<int> > > map1;
+vector<string> array1[110];
+vector<vector<int> >output;
+set<int> exist;
+int N;
+int M;
+void read_document() {
+	cin >> N;
+	getchar();
+	int i = 1;
+	int control = 0;
+	while (i <= N) {
+		int j = 1;
+		string line;
+		while (getline(cin, line) && line != "**********") {
+			if (j == 1) array1[i].push_back("");
+			array1[i].push_back(line);
+			string word;
+			for (auto& c : line) {
+				if (c == ' ' || isalpha(c) == false) {
+					if (exclude.count(word) != 0) word.clear();
+					else if ((word.empty() == false)) {
+						vector<int> vec;
+						vec.push_back(i);
+						vec.push_back(j);
+						map1[word].push_back(vec);
+						word.clear();
+					}
+				}
+				else {
+					c = tolower(c);
+					word.push_back(c);
+				}
+			}
+			if ((word.empty()==false) && (exclude.count(word) == 0)) {            //把最后一个单词放入map1中
+				vector<int> vec;
+				vec.push_back(i);
+				vec.push_back(j);
+				if (word == "computer") ++control;
+				map1[word].push_back(vec);
+				word.clear();
+			}
+			++j;
+		}
+		++i;
+	}
+}
+void output_word(string& word) {
+	if (map1.count(word) == 0) cout << "Sorry, I found nothing." << endl << "==========" << endl;
+	else {
+		for (auto vec : map1[word]) output.push_back(vec);
+		sort(output.begin(), output.end());
+		auto end_unique = unique(output.begin(), output.end());
+		output.erase(end_unique, output.end());
+		int index = output[0][0];
+		for (auto& vec : output) {
+			if (vec[0] != index) {
+				cout << "----------" << endl;
+				index = vec[0];
+			}
+			cout << array1[vec[0]][vec[1]] << endl;
+		}
+		cout << "==========" << endl;
+		output.clear();
+	}
+}
+void output_and_words(string& word1, string& word2) {
+	if(map1.count(word1)==0||map1.count(word2)==0) cout << "Sorry, I found nothing." << endl << "==========" << endl;
+	else {
+		for (auto &vec1:map1[word1])
+			for (auto& vec2 : map1[word2]) 
+				if (vec1[0] == vec2[0]) {
+					output.push_back(vec1);
+					output.push_back(vec2);
+				}
+		if (output.size() ==0) cout << "Sorry, I found nothing." << endl << "==========" << endl;
+		else {
+			sort(output.begin(), output.end());
+			auto end_unique = unique(output.begin(), output.end());
+			output.erase(end_unique, output.end());
+			int index = output[0][0];
+			for (auto vec : output) {
+				if (vec[0] != index) {
+					index = vec[0];
+					cout << "----------" << endl;
+				}
+				cout << array1[vec[0]][vec[1]] << endl;
+			}
+			cout << "==========" << endl;
+			output.clear();
+		}
+	}
+}
+void output_or_words(string& word1, string& word2) {
+	if (map1.count(word1) == 0 && map1.count(word2) == 0) cout << "Sorry, I found nothing." << endl << "==========" << endl;
+	else {
+		if (map1.count(word1) != 0) for (auto vec : map1[word1]) output.push_back(vec);
+		if (map1.count(word2) != 0)  for (auto vec : map1[word2])output.push_back(vec);
+		sort(output.begin(), output.end());
+		auto end_unique = unique(output.begin(), output.end());
+		output.erase(end_unique, output.end());
+		int index = output[0][0];
+		for (auto vec : output) {
+			if (vec[0] != index) {
+				index = vec[0];
+				cout << "----------"<<endl;
+			}
+			cout << array1[vec[0]][vec[1]] << endl;
+		}
+		cout << "==========" << endl;
+		output.clear();
+	}
+}
+void output_not(string &word) {
+	if (map1.count(word) == 0) for (int i = 1; i <= N; ++i) exist.insert(i);
+	else for (auto vec : map1[word]) exist.insert(vec[0]);
+	int cnt = 0;
+	for (int i = 1; i <= N; ++i) {
+		if (exist.count(i) == 0) {
+			if (cnt != 0) cout << "----------" << endl;
+			for (auto s : array1[i]) {
+				if (s == "") continue;
+				cout << s << endl;
+				++cnt;
+			}
+		}
+	}
+	if (exist.size() == N) cout << "Sorry, I found nothing." << endl;
+	cout << "==========" << endl;
+	exist.clear();
+}
+void read_qurry() {
+	cin >> M;
+	getchar();
+	int k = 1;
+	while (k <= M) {
+		string s;
+		getline(cin, s);
+		stringstream ss(s);
+		string s0;
+		vector<string> qurry;
+		while (ss >> s0) qurry.push_back(s0);
+		if (qurry.size() == 1) { output_word(qurry[0]); }
+		else if (qurry.size() == 2) { output_not(qurry[1]); }
+		else {
+			if (qurry[1] == "AND") { output_and_words(qurry[0], qurry[2]); }
+			else { output_or_words(qurry[0], qurry[2]); }
+		}
+		++k;
+	}
+}
+int main() {
+	read_document();
+	read_qurry();
+	return 0;
+}
