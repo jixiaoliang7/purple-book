@@ -1,0 +1,127 @@
+#include<cstdio>
+#include<cctype>
+#include<string>
+#include<vector>
+#include<iterator>
+#include<iostream>
+#include<algorithm>
+#include<sstream>
+#include<iomanip>
+#include<queue>
+#include<map>
+#include<set>
+using namespace std;
+map<string, string>map1;
+vector<string> old;
+vector<string> xin;
+vector<string>add;
+vector<string>jian;
+vector<string> star;
+int main() {
+	int T;
+	cin >> T;
+	getchar();
+	while (T) {
+		getchar();
+		char c;
+		string word;
+		string value;
+		bool is_word = true;
+		while (true) {
+			c = getchar();
+			if (c == '}') { 
+				if (!value.empty()) { 
+					map1[word] = value; 
+					word.clear(); 
+					value.clear(); 
+				} 
+				getchar(); 
+				break; 
+			}
+			if (c == ':') {
+				is_word = false; 
+				old.push_back(word);
+				continue;
+			}
+			if (c == ',') {
+				map1[word] = value;
+				word.clear();
+				value.clear();
+				is_word = true;
+				continue;
+			}
+			if (is_word) word.push_back(c);
+			else value.push_back(c);
+		}
+		getchar();
+		is_word = true;
+		while (true) {
+			c = getchar();
+			if (c == '}') {
+				if (!value.empty()) {
+					if (map1.count(word) == 0) add.push_back(word);
+					else if (map1[word] != value) star.push_back(word);
+					else;
+					word.clear();
+					value.clear();
+				}
+				getchar();
+				break;
+			}
+			if (c == ':') {
+				is_word = false; 
+				xin.push_back(word);
+				continue;
+			}
+			if (c == ',') {
+				if (map1.count(word) == 0) add.push_back(word);
+				else if (map1[word] != value) star.push_back(word);
+				else;
+				word.clear();
+				value.clear();
+				is_word = true;
+				continue;
+			}
+			if (is_word) word.push_back(c);
+			else value.push_back(c);
+		}
+		for (auto str : old) if (find(xin.begin(), xin.end(), str) == xin.end()) jian.push_back(str);
+		sort(add.begin(), add.end());
+		sort(jian.begin(), jian.end());
+		sort(star.begin(), star.end());
+		if (!add.empty()) {
+			cout << '+';
+			for (int i = 1; i <= add.size(); ++i) {
+				if (i != 1)cout << ',';
+				cout << add[i - 1];
+			}
+			cout << endl;
+		}
+		if (!jian.empty()) {
+			cout << '-';
+			for (int i = 1; i <= jian.size(); ++i) {
+				if (i != 1)cout << ',';
+				cout << jian[i - 1];
+			}
+			cout << endl;
+		}
+		if (!star.empty()) {
+			cout << '*';
+			for (int i = 1; i <= star.size(); ++i) {
+				if (i != 1)cout << ',';
+				cout << star[i - 1];
+			}
+			cout << endl;
+		}
+		if (add.empty() && jian.empty() && star.empty()) cout << "No changes" << endl;
+		cout << endl;
+		map1.clear();
+		add.clear();
+		jian.clear();
+		star.clear();
+		old.clear();
+		xin.clear();
+		--T;
+	}
+	return 0;
+}
