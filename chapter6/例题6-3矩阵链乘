@@ -1,0 +1,72 @@
+#include<cstdio>
+#include<cctype>
+#include<string>
+#include<vector>
+#include<iterator>
+#include<iostream>
+#include<algorithm>
+#include<sstream>
+#include<iomanip>
+#include<queue>
+#include<map>
+#include<set>
+#include<stack>
+using namespace std;
+map<char, vector<int> > map1;
+stack<vector<int> >stack1;
+int main() {
+	int N;
+	cin >> N;
+	for (int i = 1; i <= N; ++i) {
+		char c;
+		cin >> c;
+		int x, y;
+		cin >> x >> y;
+		map1[c] = { x,y };
+	}
+	char c;
+	getchar();
+	int level = 0;
+	int sum = 0;
+	bool error = false;
+	while (c = getchar()) {
+		if (c == EOF) break;
+		if (c == '\n') { 
+			if (error == false) cout << sum << endl;
+			sum = 0;
+			level = 0;
+			error = false;
+			while (!stack1.empty())
+				stack1.pop(); 
+		}
+		if (error == true)continue;
+		if (level == 0 && isalpha(c));
+		else {
+			if (c == '(') {
+				++level; continue;
+			}
+			if (isalpha(c)) {
+				stack1.push(map1[c]); continue;
+			}
+			if (c == ')') {
+				--level;
+				vector<int> vec1 = stack1.top();
+				stack1.pop();
+				vector<int> vec2 = stack1.top();
+				stack1.pop();
+				if (vec1[0] != vec2[1]) {
+					error = true;
+					cout << "error" << endl;
+				}
+				else {
+					if (error == false) {
+						sum += vec1[1] * vec2[1] * vec2[0];
+						stack1.push({ vec2[0],vec1[1] });
+					}
+				}
+				continue;
+			}
+		}
+	}
+	return 0;
+}
