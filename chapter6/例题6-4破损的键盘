@@ -1,0 +1,39 @@
+#include<cstdio>
+#include<cctype>
+#include<string>
+#include<vector>
+#include<iterator>
+#include<iostream>
+#include<algorithm>
+#include<sstream>
+#include<iomanip>
+#include<queue>
+#include<list>
+#include<map>
+#include<set>
+#include<stack>
+#include<forward_list>
+using namespace std;
+list<char> flist;
+int main() {
+	char c;
+	auto p = flist.begin();
+	while (c = getchar()) {
+		if (c == EOF) break;
+		if (c == '\n') {
+			for (auto c : flist) cout << c;
+			cout << endl; 
+			flist.clear();
+			p = flist.begin();
+			continue;
+		}
+		else {
+			if (c == '[') p = flist.begin();
+			else if (c == ']') {
+				p = flist.end();
+			}
+			else p = ++flist.insert(p, c);
+		}
+	}
+	return 0;
+}
