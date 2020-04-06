@@ -1,0 +1,32 @@
+#include<cstdio>
+#include<cctype>
+#include<string>
+#include<vector>
+#include<iterator>
+#include<iostream>
+#include<algorithm>
+#include<sstream>
+#include<iomanip>
+#include<cstring>
+using namespace std;
+int main() {
+	int D, I,N;
+	cin >> N;
+	for (int j = 1; j <= N;++j){
+		cin >> D >> I;
+		int answer = 1;
+		for (int d = 1; d <= D - 1;++d) {
+			if (I % 2) {
+				answer = answer * 2;
+				I = (I + 1) / 2;
+			}
+			else {
+				answer = answer * 2 + 1;
+				I /= 2;
+			}
+		}
+		cout << answer << endl;
+	}
+	cin >> N;
+	return 0;
+}
