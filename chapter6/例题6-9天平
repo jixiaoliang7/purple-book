@@ -1,0 +1,63 @@
+#include<cstdio>
+#include<cctype>
+#include<string>
+#include<vector>
+#include<iterator>
+#include<iostream>
+#include<algorithm>
+#include<sstream>
+#include<iomanip>
+#include<cstring>
+#include<queue>
+using namespace std;
+int w;
+bool correct = true;
+int read_input() {
+	string s;
+	getline(cin, s);
+	stringstream ss(s);
+	int w1, d1, w2, d2;
+	cin >> w1 >> d1 >> w2 >> d2;
+	int left_w = 0, right_w = 0;
+	if (w1 != 0 && w2 != 0) {
+		if (w1 * d1 != w2 * d2) correct = false;
+		return (w1 + w2);
+	}
+	if (w1 != 0) {
+		right_w = read_input();
+		if (w1 *d1!= right_w*d2) correct = false;
+		return w1 + right_w;
+	}
+	if (w1 == 0) {
+		left_w = read_input();
+		if (w2 != 0) {
+			if (left_w*d1 != w2*d2) correct = false;
+			return left_w + w2;
+		}
+		else {
+			right_w = read_input();
+			if (left_w*d1 != right_w*d2) correct = false;
+			return left_w + right_w;
+		}
+	}
+}
+int main() {
+	int N;
+	cin >> N;
+	getchar();
+	for (int i = 1; i <= N; ++i) {
+		correct = true;
+		read_input();
+		if (i != N) {
+			if (correct) cout << "YES" << endl;
+			else cout << "NO" << endl;
+			cout << endl;
+		}
+		if (i == N) {
+			if (correct) cout << "YES"<<endl;
+			else cout << "NO"<<endl;
+		}
+		if (i != N) getchar();
+	}
+	return 0;
+}
