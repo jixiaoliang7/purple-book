@@ -1,0 +1,90 @@
+#include<cstdio>
+#include<cctype>
+#include<string>
+#include<vector>
+#include<iterator>
+#include<iostream>
+#include<algorithm>
+#include<sstream>
+#include<iomanip>
+#include<cstring>
+#include<queue>
+#include<map>
+#include<set>
+using namespace std;
+struct Node {
+	int level;
+	char sign;
+	Node* first, * second, * third, * forth;
+	Node() :level(0), sign('p'), first(nullptr), second(nullptr), third(nullptr), forth(nullptr) {}
+};
+Node* new_node() { return new Node(); }
+struct Tree {
+	Node* root;
+	Tree() :root(nullptr) {}
+};
+Node* construct(Node* node,int k) {
+	node->sign = getchar();
+	node->level = k;
+	if (node->sign != 'p') return node;
+	Node* node1 = new_node();
+	Node* node2 = new_node();
+	Node* node3 = new_node();
+	Node* node4 = new_node();
+	node->first = construct(node1,k/2);
+	node->second = construct(node2,k/2);
+	node->third = construct(node3,k/2);
+	node->forth = construct(node4,k/2);
+	return node;
+}
+void construct_tree(Tree &tree) {
+	tree.root = new_node();
+	tree.root->sign = getchar();
+	tree.root->level = 32;
+	if (tree.root->sign != 'p') return;
+	Node* node1 = new_node();
+	Node* node2 = new_node();
+	Node* node3 = new_node();
+	Node* node4 = new_node();
+	tree.root->first = construct(node1, 16);
+	tree.root->second = construct(node2, 16);
+	tree.root->third = construct(node3, 16);
+	tree.root->forth = construct(node4, 16);
+}
+int calculate(Node* node) {
+	if (node->sign == 'e') return 0;
+	if (node->sign == 'f') return node->level* node->level;
+	if (node->sign == 'p') return (calculate(node->first) + calculate(node->second) + calculate(node->third) + calculate(node->forth));
+}
+int calculate(Node* node1, Node* node2) {
+	if (node1->sign == 'e') return calculate(node2);
+	if (node2->sign == 'e') return calculate(node1);
+	if (node1->sign == 'f' || node2->sign == 'f') return node1->level*node1->level;
+	return calculate(node1->first, node2->first) + calculate(node1->second, node2->second) +
+		calculate(node1->third, node2->third) + calculate(node1->forth, node2->forth);
+}
+void remove_tree(Node* node) {
+	if (node == nullptr) return;
+	remove_tree(node->first);
+	remove_tree(node->second);
+	remove_tree(node->third);
+	remove_tree(node->forth);
+	delete node;
+}
+int main(){
+	int N;
+	cin >> N;
+	getchar();
+	for (int i = 1; i <= N; ++i) {
+		Tree tree1, tree2;
+		construct_tree(tree1);
+		getchar();
+		construct_tree(tree2);
+		getchar();
+		int result = calculate(tree1.root, tree2.root);
+		remove_tree(tree1.root);
+		remove_tree(tree2.root);
+		cout << "There are " << result << " black pixels." << endl;
+	}
+	return 0;
+}
