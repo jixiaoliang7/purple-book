@@ -1,0 +1,100 @@
+#include<cstdio>
+#include<cctype>
+#include<string>
+#include<vector>
+#include<iterator>
+#include<iostream>
+#include<algorithm>
+#include<sstream>
+#include<iomanip>
+#include<cstring>
+#include<queue>
+#include<map>
+#include<set>
+using namespace std;
+map<int, int> map0;
+set<int> set0;
+struct Node {
+	int value;
+	int position;
+	Node* left;
+	Node* right;
+	Node() :value(0), position(0), left(nullptr), right(nullptr) {}
+};
+Node* root = nullptr;
+Node* new_node() { return new Node(); }
+void add_node(Node* father,int level,bool is_left = true) {
+	int value=0;
+	cin >> value;
+	if (value == -1) {
+		if (is_left) {
+			add_node(father,level,false);
+			return;
+		}
+		else return;
+	}
+	Node* node = new_node();
+	node->value = value;
+	if (is_left) {
+		--level;
+		node->position = level;
+		father->left = node;
+		add_node(node, level);
+		++level;
+		add_node(father, level, false);
+	}
+	else {
+		++level;
+		node->position = level;
+		father->right = node;
+		add_node(node,level);
+	}
+}
+void read_tree(Node* node) {
+	if (node == nullptr) return;
+	map0[node->position] += node->value;
+	set0.insert(node->position);
+	read_tree(node->left);
+	read_tree(node->right);
+}
+void output(int n) {
+	if (n != 1) cout << endl;
+	cout << "Case " << n << ":" << endl;
+	read_tree(root);
+	int cnt = 1;
+	for (int i : set0) {
+		if (cnt != 1) cout << " ";
+		cout << map0[i];
+		++cnt;
+	}
+	cout << endl;
+}
+void remove_tree(Node* node) {
+	if (node == nullptr) return;
+	remove_tree(node->left);
+	remove_tree(node->right);
+	delete node;
+}
+bool read_input() {
+	int k;
+	cin >> k;
+	if (k == -1) return false;
+	root = new_node();
+	root->value = k;
+	root->position = 0;
+	add_node(root, 0);
+	return true;
+}
+int main() {
+	int count = 1;
+	while (true) {
+		if (!read_input()) break;
+		output(count);
+		++count;
+		map0.clear();
+		set0.clear();
+		remove_tree(root);
+	}
+	cout << endl;
+	return 0;
+}
