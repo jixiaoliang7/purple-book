@@ -1,0 +1,57 @@
+#include<cstdio>
+#include<cctype>
+#include<string>
+#include<vector>
+#include<iterator>
+#include<iostream>
+#include<algorithm>
+#include<sstream>
+#include<iomanip>
+#include<cstring>
+#include<queue>
+#include<map>
+#include<set>
+using namespace std;
+char array0[105][105];
+int ind[105][105];
+int cnt;
+int m, n;
+void dfs(int i, int j) {
+	if (i > m || j > n || i < 1 || j < 1) return;
+	if (ind[i][j] == 0 && array0[i][j] == '@') {
+		ind[i][j]++;
+		dfs(i - 1, j);
+		dfs(i + 1, j);
+		dfs(i, j + 1);
+		dfs(i, j - 1);
+		dfs(i + 1, j + 1);
+		dfs(i + 1, j - 1);
+		dfs(i - 1, j + 1);
+		dfs(i - 1, j - 1);
+	}
+	return;
+}
+int main(){
+	while (true) {
+		cin >> m >> n;
+		getchar();
+		if (m == 0) break;
+		for (int i = 1; i <= m; ++i) {
+			for (int j = 1; j <= n; ++j)
+				array0[i][j] = getchar();
+			getchar();
+		}
+		cnt = 0;
+		memset(ind, 0, sizeof(ind));
+		for (int i = 1; i <= m; ++i) {
+			for (int j = 1; j <= n; ++j) {
+				if (ind[i][j] == 0 && array0[i][j] == '@') {
+					++cnt;
+					dfs(i, j);
+				}
+			}
+		}
+		cout << cnt << endl;
+	}
+	return 0;
+}
