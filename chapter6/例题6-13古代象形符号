@@ -1,0 +1,137 @@
+#include<cstdio>
+#include<cctype>
+#include<string>
+#include<vector>
+#include<iterator>
+#include<iostream>
+#include<algorithm>
+#include<sstream>
+#include<iomanip>
+#include<cstring>
+#include<queue>
+#include<map>
+#include<set>
+using namespace std;
+map<char,string> map0;
+int m, n;
+int cnt;
+int number;
+string array0[205];
+int cover[205][205];
+int answer[6];
+map<int, int>map1;
+void dfs_black(int i,int j,int &num){
+	if (i < 0 || j<0 || i>m - 1 || j>4 * n - 1) return;
+	if (cover[i][j] == 0 && array0[i][j] == '1') {
+		cover[i][j]=num;
+		dfs_black(i-1, j,num);
+		dfs_black(i+1, j ,num);
+		dfs_black(i, j + 1,num);
+		dfs_black(i, j-1,num);
+	}
+	return;
+}
+void dfs_white(int i, int j) {
+	if (i < 0 || j<0 || i>m - 1 || j>4 * n - 1) return;
+	if (cover[i][j] == 0 && array0[i][j] == '0') {
+		cover[i][j] =1;
+		dfs_white(i-1, j);
+		dfs_white(i+1,j);
+		dfs_white(i, j + 1);
+		dfs_white(i, j-1);
+	}
+	return;
+}
+void dfs_background(int i,int j) {
+	if (i < 0 || j<0 || i>m - 1 || j>4 * n - 1) return;
+	if (cover[i][j] == 0 && array0[i][j] == '0') {
+		cover[i][j]=1;
+		dfs_background(i-1, j);
+		dfs_background(i+1, j);
+		dfs_background(i, j+1);
+		dfs_background(i , j-1);
+	}
+	return;
+}
+int main(){
+	map0['0'] = "0000"; map0['1'] = "0001"; map0['2'] = "0010"; map0['3'] = "0011"; map0['4'] = "0100"; map0['5'] = "0101";
+	map0['6'] = "0110"; map0['7'] = "0111"; map0['8'] = "1000"; map0['9'] = "1001"; map0['a'] = "1010"; map0['b'] = "1011";
+	map0['c'] = "1100"; map0['d'] = "1101"; map0['e'] = "1110"; map0['f'] = "1111";
+	cnt = 1;
+	while (true) {
+		cin >> m >> n;
+		getchar();
+		number = 0;
+		if (m == 0) break;
+		for (int i = 0; i <= m - 1; ++i) {
+			array0[i].clear();
+			for (int j = 1; j <= n; ++j) {
+				array0[i].append(map0[getchar()]);
+			}
+			getchar();
+		}
+		memset(cover, 0, sizeof(cover));
+		for (int j = 0; j <= n * 4 - 1; ++j) {
+			if (cover[0][j] == 0 && array0[0][j] == '0') dfs_background(0, j);
+		}
+		for (int j = 0; j <= n * 4 - 1; ++j) {
+			if (cover[m-1][j] == 0 && array0[m-1][j] == '0') dfs_background(m-1, j);
+		}
+		for (int i = 0; i <= m - 1; ++i) {
+			if (cover[i][0] == 0 && array0[i][0] == '0') dfs_background(i, 0);
+		}
+		for (int i = 0; i<= m - 1; ++i) {
+			if (cover[i][4*n-1] == 0 && array0[i][4*n-1] == '0') dfs_background(i, 4*n-1);
+		}
+		for (int i = 0; i <= m - 1; ++i) {
+			for (int j = 0; j <= n * 4 - 1; ++j) {
+				if (cover[i][j] == 0 && array0[i][j] == '1') {
+					++number;
+					map1[number] = 0;
+					dfs_black(i, j, number);
+					continue;
+				}
+				if (cover[i][j] == 0 && array0[i][j] == '0') {
+					int k = 0;
+					if (array0[i - 1][j] == '1') {
+						k = cover[i - 1][j];
+						map1[k]++;
+						dfs_white(i, j);
+						continue;
+					}
+					if (array0[i + 1][j] == '1') {
+						k = cover[i + 1][j];
+						map1[k]++;
+						dfs_white(i, j);
+						continue;
+					}
+					if (array0[i][j + 1] == '1') {
+						k = cover[i][j + 1];
+						map1[k]++;
+						dfs_white(i, j);
+						continue;
+					}
+					if (array0[i][j - 1] == '1') {
+						k = cover[i][j - 1];
+						map1[k]++;
+						dfs_white(i, j);
+						continue;
+					}
+				}
+			}
+		}
+		cout << "Case " << cnt << ": ";
+		memset(answer, 0, sizeof(answer));
+		for (int i = 1; i <= number; ++i) answer[map1[i]]++;
+		for (int i = 1; i <= answer[1]; ++i)cout << 'A';
+		for (int i = 1; i <= answer[5]; ++i)cout << 'D';
+		for (int i = 1; i <= answer[3]; ++i)cout << 'J';
+		for (int i = 1; i <= answer[2]; ++i)cout << 'K';
+		for (int i = 1; i <= answer[4]; ++i)cout << 'S';
+		for (int i = 1; i <= answer[0]; ++i)cout << 'W';
+		cout << endl;
+		++cnt;
+		map1.clear();
+	}
+	return 0;
+}
