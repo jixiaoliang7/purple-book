@@ -1,0 +1,121 @@
+#include<cstdio>
+#include<cctype>
+#include<string>
+#include<vector>
+#include<iterator>
+#include<iostream>
+#include<algorithm>
+#include<sstream>
+#include<cstring>
+#include<queue>
+#include<map>
+#include<set>
+using namespace std;
+map<char, int> direction;
+map<char, int> turn;
+int can_walk[15][15][5][5];
+int d[15][15][5];
+int r, c;
+bool answer = true;
+int r0,c0,r1, c1, r2, c2;
+char heading;
+const int dc[] = { 0,-1,0,1 };
+const int dr[] = { -1,0,1,0 };
+bool inside(int r, int c) {
+    return r >= 1 && r <= 9 && c >= 1 && c <= 9;
+}
+struct Node {
+	int r;
+	int c;
+	int dir;
+	Node() :r(0), c(0), dir(0) {}
+	Node(int r, int c, int dir) :r(r), c(c), dir(dir) {}
+};
+Node walk(const Node& node, int turns) {
+	int dir = node.dir;
+	if (turns == 1)dir = (dir + 1) % 4;
+	if (turns == 2)dir = (dir + 3) % 4;
+	return Node(node.r + dr[dir], node.c + dc[dir], dir);
+}
+Node p[15][15][5];
+bool read_input() {
+	answer = true;
+	string name;
+	cin >> name;
+	if (name == "END") return false;
+	cin >> r0 >> c0 >> heading >> r2 >> c2;
+	if (heading == 'N') r1 = r0-1, c1 = c0;
+	else if (heading == 'S')r1 = r0+1, c1 = c0;
+	else if (heading == 'W') r1 = r0, c1 = c0-1;
+	else r1 = r0, c1 = c0+1;
+	if (!inside(r1, c1)) answer = false;
+	while (true) {
+		cin >> r;
+		if (r == 0)break;
+		cin >> c;
+		string s;
+		while (true) {
+			cin >> s;
+			if (s == "*")break;
+			int k = direction[s[0]];
+			for (int i = 1; i <= s.size() - 1; ++i) {
+				int j = turn[s[i]];
+				can_walk[r][c][k][j] = true;
+			}
+		}
+	}
+	cout << name << endl;
+	return true;
+}
+void output(Node node) {
+	vector<Node> nodes;
+	for (;;) {
+		nodes.push_back(node);
+		if (d[node.r][node.c][node.dir] == 0)break;
+		node = p[node.r][node.c][node.dir];
+	}
+	nodes.push_back(Node(r0, c0, direction[heading]));
+	int cnt = 0;
+	for (int i = nodes.size() - 1; i >= 0; --i) {
+		if (cnt % 10 == 0)cout << " ";
+		cout << " (" << nodes[i].r << "," << nodes[i].c << ")";
+		++cnt;
+		if (cnt % 10 == 0)cout << endl;
+	}
+	if (cnt % 10 != 0)cout << endl;
+}
+void bfs() {
+	queue<Node> q;
+	memset(d, -1, sizeof(d));
+	Node node = Node(r1, c1, direction[heading]);
+	d[node.r][node.c][node.dir] = 0;
+	q.push(node);
+	while (!q.empty()) {
+		Node node = q.front();
+		q.pop();
+		if (node.r == r2 && node.c == c2) { output(node); return; }
+		for (int i = 0; i < 3; ++i) {
+			Node node1 = walk(node, i);
+			if (can_walk[node.r][node.c][node.dir][i] && inside(node1.r,node1.c) && d[node1.r][node1.c][node1.dir] < 0) {
+				d[node1.r][node1.c][node1.dir] = d[node.r][node.c][node.dir] + 1;
+				p[node1.r][node1.c][node1.dir] = node;
+				q.push(node1);
+			}
+		}
+	}
+	cout << "  No Solution Possible" << endl;
+}
+int main(){
+	direction['N'] = 0; direction['W'] = 1; direction['S'] = 2; direction['E'] = 3;
+	turn['F'] = 0; turn['L'] = 1; turn['R'] = 2;
+	while (true) {
+		if (!read_input()) break;
+		if (answer) {
+			bfs();
+		}
+		else cout<< "  No Solution Possible" << endl;
+		memset(p, 0, sizeof(p));
+		memset(can_walk, 0, sizeof(can_walk));
+	}
+	return 0;
+}
