@@ -1,0 +1,97 @@
+#include<cstdio>
+#include<cctype>
+#include<string>
+#include<vector>
+#include<iterator>
+#include<iostream>
+#include<algorithm>
+#include<sstream>
+#include<cstring>
+#include<queue>
+#include<map>
+#include<set>
+int N;
+using namespace std;
+int path_in[26];
+int path_out[26];
+int G[26][26];
+int c[26];
+set<int> letters;
+void read_input(int n) {
+	while (n) {
+		--n;
+		string word;
+		cin >> word;
+		letters.insert(word[0]-'a');
+		letters.insert(word[word.size() - 1]-'a');
+		path_out[word[0]-'a']++;
+		path_in[word[word.size() - 1] - 'a' ]++;
+		G[word[0]-'a'][word[word.size() - 1]-'a']++;
+	}
+}
+bool dfs(int k) {
+	c[k] = 1;
+	for (int j = 0; j < 26; ++j) {
+		if (c[j] == 0 && (G[k][j]!=0 || G[j][k]!=0)) {
+			c[j] = 1;
+			if (dfs(j)) return true;
+			else return false;
+		}
+	}
+	return true;
+}
+bool is_connect() {
+	for (int i = 0; i < 26; ++i) {
+		if (letters.count(i)) {
+			if (dfs(i)) {
+				int cnt=0;
+				for (int j = 0; j < 26; ++j) if (c[j] == 1) ++cnt;
+				if (cnt == letters.size()) return true;
+				else return false;
+			}
+			else return false;
+		}
+	}
+	return false;
+}
+bool is_euler() {
+	if (!is_connect()) return false;
+	int different = 0;
+	bool different_1 = false;
+	bool different_2 = false;
+	for (int i = 0; i < 26; ++i) {
+		if (!letters.count(i))continue;
+		if (path_in[i] != path_out[i]) {
+			++different;
+			if (path_in[i] == path_out[i] + 1) different_1 = true;
+			if (path_in[i] == path_out[i] - 1)different_2 = true;
+		}
+	}
+	if (different > 2) return false;
+	if (different == 2) {
+		if (different_1 && different_2) return true;
+		else return false;
+	}
+	if (different == 0)return true;
+	else {
+		if (different_1 || different_2) return true;
+		else return false;
+	}
+}
+int main(){
+	int T;
+	cin >> T;
+	while (T) {
+		--T;
+		cin >> N;
+		read_input(N);
+		if (is_euler()) cout << "Ordering is possible." << endl;
+		else cout << "The door cannot be opened." << endl;
+		memset(G, 0, sizeof(G));
+		memset(path_in, 0, sizeof(path_in));
+		memset(path_out, 0, sizeof(path_out));
+		memset(c, 0, sizeof(c));
+		letters.clear();
+	}
+	return 0;
+}
