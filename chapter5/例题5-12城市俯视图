@@ -1,0 +1,68 @@
+#include<cstdio>
+#include<cctype>
+#include<string>
+#include<vector>
+#include<iterator>
+#include<iostream>
+#include<algorithm>
+#include<sstream>
+#include<cstring>
+#include<queue>
+#include<map>
+#include<set>
+using namespace std;
+int m;
+int n;
+struct Building {
+	int id;
+	double x, y, w, d, h;
+	bool operator < (const Building& other) const {
+		return x < other.x || (x == other.x && y < other.y);
+	}
+}buildings[105];
+double x[300];
+bool cover(int index, double mx) {
+	return (buildings[index].x <= mx) && (mx <= (buildings[index].x + buildings[index].w));
+}
+bool is_visible(int index) {
+	for (int j = 0; j < m - 1; ++j) {
+		if (cover(index, (x[j] + x[j + 1]) / 2)) {
+			int haha = 0;
+			for (int i = 0; i <= n - 1; ++i) {
+				if ((cover(i, (x[j] + x[j + 1]) / 2)) && (buildings[i].y < buildings[index].y) && (buildings[i].h >= buildings[index].h)) break;
+				else ++haha;
+			}
+			if (haha == n) return true;
+		}
+	}
+	return false;
+}
+int main() {
+	int cnt = 0;
+	while (true) {
+		++cnt;
+		cin >> n;
+		if (n == 0) break;
+		for(int i=0;i<=n-1;++i){
+			cin >> buildings[i].x >> buildings[i].y >> buildings[i].w >> buildings[i].d >> buildings[i].h;
+			buildings[i].id = i+1;
+			x[2 * i] = buildings[i].x;
+			x[2 * i + 1] = buildings[i].x + buildings[i].w;
+		}
+		sort(buildings, buildings + n);
+		sort(x, x + 2 * n);
+		m = unique(x, x + 2 * n) - x;
+		if (cnt != 1) cout << endl;
+		cout << "For map #" << cnt << ", the visible buildings are numbered as follows :" << endl;
+		int count = 0;
+		for (int i = 0; i < n; ++i) {
+			if (is_visible(i)) {
+				if (count != 0)cout << " ";
+				cout << buildings[i].id;
+				++count;
+			}
+		}
+		cout << endl;
+	}
+	return 0;
+}
