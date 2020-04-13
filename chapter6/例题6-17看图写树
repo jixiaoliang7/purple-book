@@ -13,43 +13,53 @@
 using namespace std;
 string array0[210];
 int lines;
-void construct(char letter,int index,int line) {
+string s;
+void construct(char letter, int index, int line) {
 	cout << letter;
 	if (line < lines && array0[line + 1][index] == '|') {
 		cout << "(";
 		int begin = index;
 		int end = index;
-		for (int j = index-1; j >= 0; --j) {
+		for (int j = index - 1; j >= 0; --j) {
 			if (array0[line + 2][j] != '-') break;
 			--begin;
 		}
-		for (int k = index+1; k <= array0[line + 2].size() - 1; ++k) {
+		for (int k = index + 1; k <= array0[line + 2].size() - 1; ++k) {
 			if (array0[line + 2][k] != '-') break;
 			++end;
 		}
 		for (int i = begin; i <= array0[line + 3].size() - 1; ++i) {
 			if (i > end) break;
-			if (isalpha(array0[line + 3][i])) construct(array0[line + 3][i], i, line + 3);
+			if (array0[line + 3][i] != ' ') construct(array0[line + 3][i], i, line + 3);
 		}
 		cout << ")";
 	}
 	else cout << "()";
 }
-int main(){
+int main() {
 	int T;
 	cin >> T;
 	getchar();
+	bool kong = false;
 	while (T--) {
 		lines = 0;
 		while (true) {
-			string s;
 			getline(cin, s);
-			if (s == "#") break;
+			if (s == "#") {
+				if (lines == 0) kong = true;
+				break;
+			}
 			++lines;
 			array0[lines] = s;
 		}
+		if (kong) { kong = false;
+		cout << "()" << endl;
+		continue;
+		}
 		cout << "(";
-		for (int i = 0; i <= array0[1].size() - 1; ++i) if (isalpha(array0[1][i])) construct(array0[1][i], i,1);
+			for (int i = 0; i <= array0[1].size() - 1; ++i) 
+				if (array0[1][i] != ' ') 
+					construct(array0[1][i], i, 1);
 		cout << ")" << endl;
 	}
 	return 0;
