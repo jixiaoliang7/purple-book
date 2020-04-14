@@ -1,0 +1,116 @@
+#include<cstdio>
+#include<cctype>
+#include<string>
+#include<vector>
+#include<iterator>
+#include<iostream>
+#include<algorithm>
+#include<sstream>
+#include<cstring>
+#include<queue>
+#include<map>
+#include<set>
+using namespace std;
+int n;
+int x1[55], y_1[55], z1[55], x0[55], y_0[55], z0[55]; //x1,y1,z1负责存储长方体的起始坐标，x0,y0,z0负责存储长方体的延申坐标
+int x_coor[105], y_coor[105], z_coor[105];//负责存储长方体的顶点的不同的x,y,z坐标
+int nx, ny, nz;//负责记录x,y,z_coor的需求长度
+int color[105][105][105];
+int X1, X0, Y1, Y0, Z1, Z0;
+int dx[] = { 1,-1,0,0,0,0 };
+int dy[] = { 0,0,1,-1,0,0 };
+int dz[] = { 0,0,0,0,1,-1 };
+struct Cell {
+	int x, y, z;
+	Cell(int x = 0, int y = 0, int z = 0) :x(x), y(y), z(z) {}
+	bool valid() const {
+		return 0 <= x && x <= nx - 2 && 0 <= y && y <= ny - 2 && 0 <= z && z <= nz - 2;
+	}
+	Cell neighbor(int dir) const {
+		return Cell(x + dx[dir], y + dy[dir], z + dz[dir]);
+	}
+	bool is_surface() const {
+		return color[x][y][z] == 1;
+	}
+	bool is_space_not_use() const {
+		return color[x][y][z] == 2;
+	}
+	void set_use() const {
+		color[x][y][z] = 2;
+	}
+	int area(int dir) const {
+		if (dx[dir] != 0) return (y_coor[y + 1] - y_coor[y]) * (z_coor[z + 1] - z_coor[z]);
+		if (dy[dir] != 0) return (x_coor[x + 1] - x_coor[x]) * (z_coor[z + 1] - z_coor[z]);
+		return (x_coor[x + 1] - x_coor[x]) * (y_coor[y + 1] - y_coor[y]);
+	}
+	int volume() const {
+		return (x_coor[x + 1] - x_coor[x]) * (y_coor[y + 1] - y_coor[y]) * (z_coor[z + 1] - z_coor[z]);
+	}
+};
+void discretize(int* array0, int& k) { //这个函数负责将array0去重并排序
+	sort(array0, array0 + k);
+	k = unique(array0, array0 + k) - array0;
+}
+int ID(int* array0, int k, int val) {
+	return lower_bound(array0, array0 + k, val) - array0;
+}
+void floodfill(int& v, int& s) {
+	v = 0;
+	s = 0;
+	Cell cell0;
+	cell0.set_use();
+	queue<Cell> q;
+	q.push(cell0);
+	while (!q.empty()) {
+		Cell cell1 = q.front();
+		q.pop();
+		v += cell1.volume();
+		for (int i = 0; i < 6; ++i) {
+			Cell cell2 = cell1.neighbor(i);
+			if (!cell2.valid())continue;
+			if (cell2.is_surface()) s += cell1.area(i);
+			else if (!cell2.is_space_not_use()) {
+				cell2.set_use();
+				q.push(cell2);
+			}
+		}
+	}
+	v = 1001 * 1001 * 1001 - v;
+}
+int main() {
+	int T;
+	cin >> T;
+	while (T--) {
+		cin >> n;
+		x_coor[0] = 0; y_coor[0] = 0; z_coor[0] = 0;
+		x_coor[1] = 1001; y_coor[1] = 1001; z_coor[1] = 1001;
+		nx = ny = nz = 2;
+		for (int i = 0; i < n; ++i) {
+			cin >> x1[i] >> y_1[i] >> z1[i] >> x0[i] >> y_0[i] >> z0[i];
+			x0[i] += x1[i]; y_0[i] += y_1[i]; z0[i] += z1[i]; //将长方体的起始坐标和延伸长度加起来，得到延伸坐标，存储到x0,y0,z0中
+			x_coor[nx++] = x1[i]; x_coor[nx++] = x0[i];
+			y_coor[ny++] = y_1[i]; y_coor[ny++] = y_0[i];
+			z_coor[nz++] = z1[i]; z_coor[nz++] = z0[i];
+		}
+		//现在要将x,y,z_coor中重复的元素去掉，并排序
+		discretize(x_coor, nx); discretize(y_coor, ny); discretize(z_coor, nz);//现在nx,ny,nz记录的是x,y,z_coor的不同坐标的个数
+		//下面开始涂色
+		//此处采用离散化涂色，本来可能涂色的坐标有1001个，但是那样的话就太多，容易造成TLE
+		//而注意到所有不同的x坐标最多有102个，所以采用离散化涂色，用x_coor存储原先的坐标
+		for (int i = 0; i < n; ++i) {
+			X1 = ID(x_coor, nx, x1[i]); X0 = ID(x_coor, nx, x0[i]);
+			Y1 = ID(y_coor, ny, y_1[i]); Y0 = ID(y_coor, ny, y_0[i]);
+			Z1 = ID(z_coor, nz, z1[i]); Z0 = ID(z_coor, nz, z0[i]);
+			for (int X = X1; X < X0; ++X)
+				for (int Y = Y1; Y < Y0; ++Y)
+					for (int Z = Z1; Z < Z0; ++Z) {
+						color[X][Y][Z] = 1;
+					}
+		}
+		int v, s;//体积和面积
+		floodfill(v, s);
+		cout << s << " " << v << endl;
+		memset(color, 0, sizeof(color));
+	}
+	return 0;
+}
