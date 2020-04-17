@@ -1,0 +1,79 @@
+#include<cstdio>
+#include<cctype>
+#include<string>
+#include<vector>
+#include<iterator>
+#include<iostream>
+#include<algorithm>
+#include<sstream>
+#include<cstring>
+#include<queue>
+#include<map>
+#include<stack>
+#include<set>
+using namespace std;
+int n, m, cnt;
+int a, b, c;
+map<int,int> G[100005];
+int access[100005];
+vector<int> stack0;
+vector<int> path[200005];
+vector<vector<int> > result;
+void dfs(int i) {
+	access[i] = 1;
+	if (i == n) {
+		path[cnt] = stack0;
+		++cnt;
+		access[i] = 0;
+		stack0.pop_back();
+		return;
+	}
+	for (int j = 1; j <= n; ++j) 
+		if (G[i].count(j) && access[j] == 0) {
+		stack0.push_back(G[i][j]);
+		dfs(j);
+	}
+	if(i!=1)
+		stack0.pop_back();
+	access[i] = 0;
+	return;
+}
+void find_path() {
+	int xiao=1000000;
+	for (int i = 0; i < cnt; ++i) {
+		if (path[i].size() < xiao) xiao = path[i].size();
+	}
+	for (int i = 0; i < cnt; ++i) {
+		if (path[i].size() == xiao) result.push_back(path[i]);
+	}
+	sort(result.begin(), result.end());
+	cout << xiao << endl;
+	cout << result[0][0];
+	for (int k = 1; k < xiao; ++k) cout << " " << result[0][k];
+	cout << endl;
+	return;
+}
+int main() {
+	while (cin >> n >> m) {
+		for (int i = 1; i <= m; ++i) {
+			cin >> a >> b >> c;
+			if (a == b) continue;
+			if (G[a].count(b)) {
+				if (c < G[a][b]) {
+					G[a][b] = c;
+					G[b][a] = c;
+				}
+				else continue;
+			}
+			G[a][b] = c; 
+			G[b][a] = c;
+		}
+		cnt = 0;
+		dfs(1);
+		find_path();
+		result.clear();
+		for (int i = 1; i <= n; ++i)
+			G[i].clear();
+	}
+	return 0;
+}
