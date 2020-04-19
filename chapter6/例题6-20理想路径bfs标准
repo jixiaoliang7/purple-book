@@ -1,0 +1,106 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include<cstdio>
+#include<cctype>
+#include<string>
+#include<vector>
+#include<iterator>
+#include<iostream>
+#include<algorithm>
+#include<sstream>
+#include<cstring>
+#include<queue>
+#include<map>
+#include<stack>
+#include<set>
+using namespace std;
+int n, m;
+int a, b, c,idx;
+int num1,num2,color;
+int min_color = 1000000000;
+vector<int> color_min;
+int access[100005];
+vector<int> G[100005];
+int d[100005];
+struct Edge {
+	int a, b, c;
+	Edge(int a = 0, int b = 0, int c = 0) : a(a), b(b), c(c) {}
+};
+vector<Edge> edges;
+void add_edge(int a, int b, int c) {
+	edges.push_back(Edge(a, b, c));
+	idx = edges.size()-1;
+	G[a].push_back(idx);
+}
+void bfs_1() {
+	d[n] = 0;
+	queue<int> q;
+	q.push(n);
+	while (!q.empty()) {
+		num1 = q.front();
+		q.pop();
+		access[num1] = 1;
+		for (int k = 0; k < G[num1].size(); ++k) {
+			num2 = edges[G[num1][k]].b;
+			if (access[num2] != 1) {
+				d[num2] = d[num1] + 1;
+				access[num2] = 1;
+				q.push(num2);
+			}
+		}
+	}
+}
+void bfs_2() {
+	memset(access, 0, sizeof(access));
+	vector<int> nxt;
+	nxt.push_back(1);
+	for (int i = 1; i <= d[1]; ++i) {
+		min_color = 1000000000;
+		for (int k = 0; k < nxt.size(); ++k) {
+			num1 = nxt[k];
+			for (int j = 0; j < G[num1].size(); ++j) {
+				num2 = edges[G[num1][j]].b;
+				if (d[num2] == d[num1] - 1) {
+					color = edges[G[num1][j]].c;
+					min_color = min(min_color, color);
+				}
+			}
+		}
+		color_min.push_back(min_color);
+		vector<int> nxt2;
+		for (int k = 0; k < nxt.size(); ++k) {
+			num1 = nxt[k];
+			for (int j = 0; j < G[num1].size(); ++j) {
+				num2 = edges[G[num1][j]].b;
+				color = edges[G[num1][j]].c;
+				if (d[num2] == d[num1] - 1&& color == min_color&&!access[num2]) {
+					nxt2.push_back(num2);
+					access[num2] = 1;
+				}
+			}
+		}
+		nxt = nxt2;
+	}
+	printf("%d\n", d[1]);
+	printf("%d", color_min[0]);
+	for (int i = 1; i <= d[1]-1; ++i)
+		printf(" %d", color_min[i]);
+	printf("\n");
+}
+int main() {
+	while (cin >> n >> m) {
+		for (int i = 1; i <= m; ++i) {
+			cin >> a >> b >> c;
+			if (a == b) continue;
+			add_edge(a, b, c);
+			add_edge(b, a, c);
+		}
+		bfs_1();
+		bfs_2();
+		memset(d, 0, sizeof(d));
+		color_min.clear();
+		edges.clear();
+		memset(access, 0, sizeof(access));
+		for (int i = 1; i <= n; ++i)G[i].clear();
+	}
+	return 0;
+}
