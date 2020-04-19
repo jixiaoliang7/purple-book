@@ -1,0 +1,80 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include<cstdio>
+#include<cctype>
+#include<string>
+#include<vector>
+#include<iterator>
+#include<iostream>
+#include<algorithm>
+#include<sstream>
+#include<cstring>
+#include<queue>
+#include<map>
+#include<stack>
+#include<set>
+using namespace std;
+int n, m;
+int a, b, c;
+int num;
+int color_min[100005];
+map<int, int> G[100005];
+int d[100005];
+void bfs_1() {
+	queue<int> q;
+	q.push(n);
+	while (!q.empty()) {
+		num = q.front();
+		q.pop();
+		if (num == 1)continue;
+		for (auto i : G[num]) {
+			if (i.first==n||(d[i.first] != 0 && d[i.first] <= d[num] + 1))continue;
+			else {
+				q.push(i.first);
+				d[i.first] = d[num] + 1;
+			}
+		}
+	}
+}
+void bfs_2() {
+	queue<int>q;
+	q.push(1);
+	while (!q.empty()) {
+		num = q.front();
+		q.pop();
+		if (num == n)continue;
+		for (auto i:G[num])
+			if (d[i.first] == d[num] - 1)
+				if (color_min[d[i.first]]==0||G[num][i.first] < color_min[d[i.first]]) color_min[d[i.first]] = G[num][i.first];
+		for (auto i : G[num])
+			if (d[i.first] == d[num] - 1)
+				if (G[num][i.first] == color_min[d[i.first]])q.push(i.first);
+	}
+	printf("%d\n", d[1]);
+	printf("%d",color_min[d[2]]);
+	for (int i = d[2]-1; i>=0; --i)
+		printf(" %d",color_min[i]);
+	printf("\n");
+}
+int main() {
+	while (scanf("%d%d",&n,&m)==2) {
+		for (int i = 1; i <= m; ++i) {
+			scanf("%d%d%d", &a, &b, &c);
+			if (a == b) continue;
+			if (G[a].count(b)) {
+				if (c < G[a][b]) {
+					G[a][b] = c;
+					G[b][a] = c;
+				}
+				else continue;
+			}
+			G[a][b] = c;
+			G[b][a] = c;
+		}
+		bfs_1();
+		bfs_2();
+		memset(d, 0, sizeof(d));
+		for (int i = 1; i <= n; ++i)G[i].clear();
+		memset(color_min, 0, sizeof(color_min));
+	}
+	return 0;
+}
