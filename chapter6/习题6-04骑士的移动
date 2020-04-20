@@ -1,0 +1,58 @@
+#include<cstdio>
+#include<cctype>
+#include<string>
+#include<vector>
+#include<iterator>
+#include<iostream>
+#include<algorithm>
+#include<sstream>
+#include<cstring>
+#include<queue>
+#include<map>
+#include<stack>
+#include<set>
+using namespace std;
+int G[10][10];
+string s1, s2;
+int dx[] = { 1,1,2,2,-1,-1,-2,-2 };
+int dy[] = { 2,-2,1,-1,2,-2,1,-1 };
+int x_1, y_1, x_2, y_2;
+bool is_legel(int x, int y) {
+	return 1 <= x && x <= 8 && 1 <= y && y <= 8;
+}
+void bfs() {
+	if (x_1 == x_2 && y_1 == y_2) {
+		cout << "To get from " << s1 << " to " << s2 << " takes " << 0 << " knight moves." << endl;
+		return;
+	}
+	queue<vector<int> >q;
+	q.push({ x_1,y_1,1 });
+	while (!q.empty()) {
+		vector<int> vec = q.front();
+		int x = vec[0];
+		int y = vec[1];
+		q.pop();
+		for (int i = 0; i < 8; ++i) {
+			if (is_legel(x + dx[i], y + dy[i]) && G[x + dx[i]][y + dy[i]] == 0) {
+				if (x + dx[i] == x_2 && y + dy[i] == y_2) {
+					cout << "To get from " << s1 << " to " << s2 << " takes " <<  vec[2] << " knight moves." << endl;
+					return;
+				}
+				G[x + dx[i]][y + dy[i]] = 1;
+				q.push({ x + dx[i], y + dy[i] ,vec[2]+1});
+			}
+		}
+	}
+}
+int main() {
+	while (cin >> s1 >> s2) {
+		x_1 = s1[0]-'a'+1;
+		y_1 = s1[1] - '0';
+		x_2 = s2[0] - 'a'+1;
+		y_2 = s2[1] - '0';
+		G[x_1][y_1] = 1;
+		bfs();
+		memset(G, 0, sizeof(G));
+	}
+	return 0;
+}
