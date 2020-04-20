@@ -1,0 +1,52 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include<cstdio>
+#include<cctype>
+#include<string>
+#include<vector>
+#include<iterator>
+#include<iostream>
+#include<algorithm>
+#include<sstream>
+#include<cstring>
+#include<queue>
+#include<map>
+#include<stack>
+#include<set>
+using namespace std;
+stack<char> stack0;
+bool answer;
+int main() {
+	int n;
+	cin >> n;
+	getchar();
+	while (n--) {
+		char c;
+		while (!stack0.empty()) stack0.pop();
+		while (true) {
+			c = getchar();
+			if (c == '\n') {
+				if (!stack0.empty())cout << "No" << endl;
+				else cout << "Yes" << endl;
+				break;
+			}
+			if (c == '(' || c == '[') stack0.push(c);
+			else if (c == ')') {
+				if (stack0.empty() || stack0.top() != '(') {
+					cout << "No" << endl;
+					while (c != '\n') c = getchar();
+					break;
+				}
+				stack0.pop();
+			}
+			else {
+				if (stack0.empty() || stack0.top() != '[') {
+					cout << "No" << endl;
+					while (c != '\n') c = getchar();
+					break;
+				}
+				stack0.pop();
+			}
+		}
+	}
+	return 0;
+}
