@@ -19,44 +19,52 @@ int num;
 int color_min[100005];
 map<int, int> G[100005];
 int d[100005];
+int access[100005];
 void bfs_1() {
+	memset(access, 0, sizeof(access));
 	queue<int> q;
 	q.push(n);
+	access[n] = 1;
 	while (!q.empty()) {
 		num = q.front();
 		q.pop();
 		if (num == 1)continue;
 		for (auto i : G[num]) {
-			if (i.first==n||(d[i.first] != 0 && d[i.first] <= d[num] + 1))continue;
+			if (access[i.first]==1)continue;
 			else {
 				q.push(i.first);
 				d[i.first] = d[num] + 1;
+				access[i.first] = 1;
 			}
 		}
 	}
 }
 void bfs_2() {
+	memset(access, 0, sizeof(access));
 	queue<int>q;
 	q.push(1);
 	while (!q.empty()) {
 		num = q.front();
 		q.pop();
 		if (num == n)continue;
-		for (auto i:G[num])
-			if (d[i.first] == d[num] - 1)
-				if (color_min[d[i.first]]==0||G[num][i.first] < color_min[d[i.first]]) color_min[d[i.first]] = G[num][i.first];
 		for (auto i : G[num])
 			if (d[i.first] == d[num] - 1)
-				if (G[num][i.first] == color_min[d[i.first]])q.push(i.first);
+				if (color_min[d[i.first]] == 0 || G[num][i.first] < color_min[d[i.first]]) color_min[d[i.first]] = G[num][i.first];
+		for (auto i : G[num])
+			if (d[i.first] == d[num] - 1)
+				if (G[num][i.first] == color_min[d[i.first]] && access[i.first] == 0) {
+					q.push(i.first);
+					access[i.first] = 1;
+				}
 	}
 	printf("%d\n", d[1]);
-	printf("%d",color_min[d[2]]);
-	for (int i = d[2]-1; i>=0; --i)
-		printf(" %d",color_min[i]);
+	printf("%d", color_min[d[2]]);
+	for (int i = d[2] - 1; i >= 0; --i)
+		printf(" %d", color_min[i]);
 	printf("\n");
 }
 int main() {
-	while (scanf("%d%d",&n,&m)==2) {
+	while (scanf("%d%d", &n, &m) == 2) {
 		for (int i = 1; i <= m; ++i) {
 			scanf("%d%d%d", &a, &b, &c);
 			if (a == b) continue;
