@@ -1,0 +1,68 @@
+#include<cstdio>
+#include<cctype>
+#include<string>
+#include<vector>
+#include<iterator>
+#include<iostream>
+#include<algorithm>
+#include<sstream>
+#include<cstring>
+#include<queue>
+#include<map>
+#include<stack>
+#include<set>
+using namespace std;
+struct Node {
+	char name;
+	Node* left;
+	Node* right;
+	Node():name(' '),left(nullptr),right(nullptr){}
+};
+Node* new_node() { return new Node(); }
+char pre_order[100];
+char in_order[100];
+Node* construct(int p1, int p2, int q1, int q2) {
+	Node* root = new_node();
+	root->name = pre_order[p1];
+	int idx=0;
+	for (int k = q1; k <= q2; ++k) if (in_order[k] == root->name) {idx = k; break;}
+	int interval1 = idx - q1;
+	int interval2 = q2 - idx;
+	if (interval1 != 0) {
+		root->left = construct(p1 + 1, p1 + interval1, q1, idx - 1);
+	}
+	else root->left = nullptr;
+	if (interval2!=0) {
+		root->right = construct(p2 - interval2 + 1, p2, idx + 1, q2);
+	}
+	else root->right = nullptr; 
+	return root;
+}
+void output(Node* node) {
+	if (node->left != nullptr) output(node->left);
+	if (node->right != nullptr) output(node->right);
+	cout << node->name;
+	return;
+}
+int main() {
+	char c;
+	int cnt;
+	while (true) {
+		cnt = 0;
+		c = getchar();
+		if (c == EOF) break;
+		pre_order[1] = c;
+		++cnt;
+		while (true) {
+			c = getchar();
+			if (c == ' ') break;
+			++cnt;
+			pre_order[cnt] = c;
+		}
+		for (int i = 1; i <= cnt; ++i) in_order[i] = getchar();
+		getchar();
+		output(construct(1, cnt, 1, cnt));
+		cout << endl;
+	}
+	return 0;
+}
