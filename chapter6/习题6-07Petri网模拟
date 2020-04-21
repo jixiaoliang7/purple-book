@@ -1,0 +1,84 @@
+#include<cstdio>
+#include<cctype>
+#include<string>
+#include<vector>
+#include<iterator>
+#include<iostream>
+#include<algorithm>
+#include<sstream>
+#include<cstring>
+#include<queue>
+#include<map>
+#include<stack>
+#include<set>
+using namespace std;
+int P[105];
+int np, nt, nf;
+int in_T[105][105];
+int out_T[105][105];
+bool allow(int j) {
+	for (int i = 1; i <= np; ++i) {
+		int k = out_T[j][i] - in_T[j][i];
+		if ((-k) > P[i]) return false;
+	}
+	return true;
+}
+void change(int j) {
+	for (int i = 1; i <= np; ++i) {
+		int k = out_T[j][i] - in_T[j][i];
+		P[i] += k;
+	}
+}
+int main() {
+	bool answer = true;
+	bool success = false;
+	int cnt = 0;
+	while (true) {
+		++cnt;
+		answer = true;
+		success = false;
+		cin >> np;
+		if (np == 0) break;
+		for (int i = 1; i <= np; ++i)cin >> P[i];
+		cin >> nt;
+		int x;
+		for (int i = 1; i <= nt; ++i) {
+			while (true) {
+				cin >> x;
+				if (x == 0) break;
+				if (x < 0) in_T[i][-x]++;
+				else out_T[i][x]++;
+			}
+		}
+		cin >> nf;
+		for (int i = 1; i <= nf; ++i) {
+			for (int j = 1; j <= nt; ++j) {
+				if (allow(j)) {
+					change(j);
+					success = true;
+					break;
+				}
+			}
+			if (success) { success = false; continue; }
+			answer = false;
+			cout << "Case " << cnt << ": dead after " << i - 1 << " transitions" << endl;
+			cout << "Places with tokens:";
+			for (int k = 1; k <= np; ++k)
+				if (P[k] != 0)
+					cout << " " << k << " (" << P[k] << ")";
+			cout << endl << endl;
+			break;
+		}
+		if (answer) {
+			cout << "Case " << cnt << ": still live after " << nf << " transitions" << endl << "Places with tokens:";
+			for (int k = 1; k <= np; ++k)
+				if (P[k] != 0)
+					cout << " " << k << " (" << P[k] << ")";
+			cout << endl << endl;
+		}
+		memset(P, 0, sizeof(P));
+		memset(in_T, 0, sizeof(in_T));
+		memset(out_T, 0, sizeof(out_T));
+	}
+	return 0;
+}
