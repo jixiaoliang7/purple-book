@@ -1,0 +1,84 @@
+#include<cstdio>
+#include<cctype>
+#include<string>
+#include<vector>
+#include<iterator>
+#include<iostream>
+#include<algorithm>
+#include<sstream>
+#include<cstring>
+#include<queue>
+#include<map>
+#include<stack>
+#include<set>
+using namespace std;
+int m, n, k;
+int grids[25][25];
+int dr[] = { 1,0,-1,0 };
+int dc[] = { 0,-1,0,1 };
+int access[25][25];
+int continuity[25][25];
+bool valid(int r, int c) {
+	return 1 <= r && r <= m && 1 <= c && c <= n;
+}
+bool bfs(){
+	if (m == 1 && n == 1) {
+		cout << 0 << endl;
+		return true;
+	}
+	queue<vector<int > >q;
+	q.push({ 1,1,0,0});
+	access[1][1] = 1;
+	while (!q.empty()) {
+		vector<int> vec = q.front();
+		q.pop();
+		for (int i = 0; i < 4; ++i) {
+			int r = vec[0] + dr[i];
+			int c = vec[1] + dc[i];
+			if (valid(r, c)) {
+				if (grids[r][c] == 1) {
+					if (vec[2] == k) {
+						continuity[r][c] = k + 1;
+						continue;
+					}
+					else {
+						vector<int> vec0 = { r,c,vec[2] + 1,vec[3] + 1 };
+						if (continuity[r][c] == 0 || vec[2] + 1 < continuity[r][c]) {
+							continuity[r][c] = vec[2] + 1;
+							if (r == m && c == n) {
+								cout << vec0[3] << endl;
+								return true;
+							}
+							q.push(vec0);
+						}
+					}
+				}
+				else if(access[r][c]==0){
+					vector<int> vec0 = { r,c,0,vec[3] + 1 };
+					if (r == m && c == n) {
+						cout << vec0[3] << endl;
+						return true;
+					}
+					q.push(vec0);
+					access[r][c] = 1;
+				}
+			}
+		}
+	}
+	return false;
+}
+int main() {
+	int T;
+	cin >> T;
+	while (T--) {
+		cin >> m >> n >> k;
+		for (int i = 1; i <= m; ++i)
+			for (int j = 1; j <= n; ++j)
+				cin >> grids[i][j];
+		if (!bfs())cout << -1 << endl;
+		memset(grids, 0, sizeof(grids));
+		memset(continuity, 0, sizeof(continuity));
+		memset(access, 0, sizeof(access));
+	}
+	return 0;
+}
