@@ -1,0 +1,99 @@
+#include<cstdio>
+#include<cctype>
+#include<string>
+#include<vector>
+#include<iterator>
+#include<iostream>
+#include<algorithm>
+#include<sstream>
+#include<cstring>
+#include<queue>
+#include<map>
+#include<stack>
+#include<set>
+using namespace std;
+int n;
+int BFS[1050];
+int DFS[1050];
+struct Node {
+	int value;
+	vector<Node*> vec;
+	Node() :value(0), vec({}) {}
+};
+Node* new_node() { return new Node(); }
+Node* nodes[1050];
+int BFS_find(int p1, int p2, int value) {
+	for (int i = p1; i <= p2; ++i)
+		if (BFS[i] == value)
+			return i;
+	return 0;
+}
+int DFS_find(int p1, int p2, int value) {
+	for (int i = p1; i <= p2; ++i)
+		if (DFS[i] == value)
+			return i;
+	return 0;
+}
+int children(int start,int p1,int p2) {
+	int size = start +p2 - p1;
+	int num = 1;
+	while (start<size) {
+		int p_last = DFS_find(p1, p2, BFS[start]);
+		start++;
+		if (DFS_find(p1, p2, BFS[start]) < p_last) return num;
+		else ++num;
+	}
+	return p2-p1+1;
+}
+Node* construct(int p1,int p2) {
+	int root_value = DFS[p1];
+	Node* root = nodes[root_value];
+	if(p1==p2) return root;
+	if (p2 == p1 + 1) { root->vec.push_back(nodes[DFS[p2]]); return root; }
+	else {
+		int start = BFS_find(1, n, DFS[p1 + 1]);
+		int num = children(start, p1 + 1, p2);
+		for (int i = 1; i <= num; ++i) {
+			if (i != num) {
+				int q1 = DFS_find(p1 + 1, p2, BFS[start+i-1]);
+				int q2 = DFS_find(p1 + 1, p2, BFS[start + i]);
+				root->vec.push_back(construct(q1, q2 - 1));
+			}
+			else {
+				int q = DFS_find(p1 + 1, p2, BFS[start + i - 1]);
+				root->vec.push_back(construct(q, p2));
+			}
+		}
+		return root;
+	}
+}
+void output() {
+	for (int i = 1; i <= n; ++i) {
+		cout << i << ":";
+		vector<int> vec;
+		for (auto c : nodes[i]->vec) vec.push_back(c->value);
+		sort(vec.begin(), vec.end());
+		for (auto c : vec) cout << " " << c;
+		cout << endl;
+	}
+}
+void remove_tree(Node* node) {
+	if (node == nullptr) return;
+	for (auto c : node->vec) remove_tree(c);
+	delete node;
+}
+int main() {
+	while (cin >> n) {
+		for (int i = 1; i <= n; ++i) {
+			Node* node = new_node();
+			node->value = i;
+			nodes[i] = node;
+		}
+		for (int i = 1; i <= n; ++i)cin >> BFS[i];
+		for (int i = 1; i <= n; ++i)cin >> DFS[i];
+		Node* root = construct(1,n);
+		output();
+		remove_tree(root);
+	}
+	return 0;
+}
