@@ -1,0 +1,95 @@
+#include<cstdio>
+#include<cctype>
+#include<string>
+#include<vector>
+#include<iterator>
+#include<iostream>
+#include<algorithm>
+#include<sstream>
+#include<cstring>
+#include<queue>
+#include<map>
+#include<stack>
+#include<set>
+using namespace std;
+deque<int> q;
+deque<int> table[10];
+int number[10];
+int cnt,idx;
+set<string> repeated;
+void pick(int &idx) {
+	if (table[idx].size() >= 3) {
+		int size = table[idx].size();
+		int sum_1 = table[idx][0] + table[idx][1] + table[idx][size - 1];
+		if (sum_1 == 10 || sum_1 == 20 || sum_1 == 30) {
+			q.push_back(table[idx][0]); q.push_back(table[idx][1]); q.push_back(table[idx][size - 1]);
+			table[idx].pop_front(); table[idx].pop_front(); table[idx].pop_back();
+			pick(idx);
+			return;
+		}
+		int sum_2 = table[idx][0] + table[idx][size - 2] + table[idx][size - 1];
+		if (sum_2 == 10 || sum_2 == 20 || sum_2 == 30) {
+			q.push_back(table[idx][0]); q.push_back(table[idx][size - 2]); q.push_back(table[idx][size - 1]);
+			table[idx].pop_front(); table[idx].pop_back(); table[idx].pop_back();
+			pick(idx);
+			return;
+		}
+		int sum_3 = table[idx][size - 3] + table[idx][size - 2] + table[idx][size - 1];
+		if (sum_3 == 10 || sum_3 == 20 || sum_3 == 30) {
+			q.push_back(table[idx][size - 3]); q.push_back(table[idx][size - 2]); q.push_back(table[idx][size - 1]);
+			table[idx].pop_back(); table[idx].pop_back(); table[idx].pop_back();
+			pick(idx);
+			return;
+		}
+		return;
+	}
+	else
+		return;
+}
+string make_string() {
+	string s;
+	for (int i = 1; i <= 7; ++i) {
+		for (auto j : table[i]) { if (j == 10) s.push_back('T');else s.push_back(j); s.push_back('|'); }
+		s.push_back('+');
+	}
+	for(auto j:q) { if (j == 10) s.push_back('T'); else s.push_back(j); s.push_back('|'); }
+	return s;
+}
+int main() {
+	while (true) {
+		bool answer = true;
+		int k;
+		cin >> k;
+		if (k == 0) break;
+		q.push_back(k);
+		for (int i = 2; i <= 52; ++i) { cin >> k; q.push_back(k); }
+		for(int j=1;j<=2;++j)
+			for (int i = 1; i <= 7; ++i) {table[i].push_back(q.front()); q.pop_front(); string s = make_string(); repeated.insert(s);}
+		cnt = 14;
+		idx = 1;
+		while ((!q.empty())&&(q.size()!=52)) {
+			if (table[idx].empty()) { idx++; if (idx == 8)idx = 1; continue; }
+			else {
+				table[idx].push_back(q.front());
+				q.pop_front();
+				++cnt;
+				pick(idx);
+				string s = make_string();
+				if (repeated.count(s)) { answer = false; break; }
+				else repeated.insert(s);
+				++idx;
+				if (idx == 8)idx = 1;
+				continue;
+			}
+		}
+		if (answer) {
+			if (q.empty())cout << "Loss: " << cnt << endl;
+			if (q.size() == 52) cout << "Win : " << cnt << endl;
+		}
+		else
+			cout << "Draw: " << cnt << endl;
+		q.clear();
+		for (int i = 1; i <= 7; ++i)table[i].clear();
+	}
+	return 0;
+}
