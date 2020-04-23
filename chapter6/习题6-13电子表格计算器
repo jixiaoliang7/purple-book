@@ -66,6 +66,7 @@ int get_value(int i,int j) {
 	string ss;
 	while (k <= size - 1) {
 		if (s[k] == '+') {
+			if (k == 0) { ++k; continue; }
 			if (isalpha(ss[0])) {
 				if (zheng) sum += get_value(ss[0] - 'A' + 1, ss[1] - '0');
 				else sum -= get_value(ss[0] - 'A' + 1, ss[1] - '0');
@@ -80,6 +81,7 @@ int get_value(int i,int j) {
 			continue;
 		}
 		else if (s[k] == '-') {
+			if (k == 0) { zheng = false; ++k; continue; }
 			if (isalpha(ss[0])) {
 				if (zheng) sum += get_value(ss[0] - 'A' + 1, ss[1] - '0');
 				else sum -= get_value(ss[0] - 'A' + 1, ss[1] - '0');
