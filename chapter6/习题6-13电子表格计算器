@@ -1,0 +1,240 @@
+#include<cstdio>
+#include<cctype>
+#include<string>
+#include<vector>
+#include<iterator>
+#include<iostream>
+#include<algorithm>
+#include<sstream>
+#include<cstring>
+#include<queue>
+#include<iomanip>
+#include<map>
+#include<stack>
+#include<set>
+using namespace std;
+int r, c;
+int has_value2[25][15];
+int has_value[25][15];
+int children[25][15];
+int G[250][250];
+map<string, int> value;
+string expression[25][15];
+char letters[] = { '0','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T' };
+char numbers[] = { '0','1','2','3','4','5','6','7','8','9' };
+bool has_alpha(string s) {
+	for (auto c : s) if (isalpha(c)) return true;
+	return false;
+}
+int to_int(string s) {
+	int sum = 0;
+	for (auto c : s) sum = sum * 10 + (c - '0');
+	return sum;
+}
+void dfs(int i, int j) {
+	int son = i * 10 + j;
+	for (int k = 10; k <= r * 10 + c-1; ++k) {
+		if (G[k][son] == 1) {
+			G[k][son] == 0;
+			int r1 = k / 10;
+			int c1 = k % 10;
+			children[r1][c1]--;
+			if (children[r1][c1] == 0) {
+				has_value2[r1][c1] = 1;
+				dfs(r1, c1);
+			}
+		}
+	}
+}
+bool has_circle() {
+	for (int i = 1; i <= r; ++i)
+		for (int j = 0; j <= c-1; ++j)
+			if (has_value2[i][j] == 0)
+				return  true;
+	return false;
+}
+int get_value(int i,int j) {
+	string name;
+	name.push_back(letters[i]);
+	name.push_back(numbers[j]);
+	string s = expression[i][j];
+	if (value.count(name)) return value[name];
+	int sum = 0;
+	int size = s.size();
+	bool zheng = true;
+	int k = 0;
+	string ss;
+	while (k <= size - 1) {
+		if (s[k] == '+') {
+			if (isalpha(ss[0])) {
+				if (zheng) sum += get_value(ss[0] - 'A' + 1, ss[1] - '0');
+				else sum -= get_value(ss[0] - 'A' + 1, ss[1] - '0');
+			}
+			else {
+				if (zheng) sum += to_int(ss);
+				else sum -= to_int(ss);
+			}
+			ss.clear();
+			zheng = true;
+			++k;
+			continue;
+		}
+		else if (s[k] == '-') {
+			if (isalpha(ss[0])) {
+				if (zheng) sum += get_value(ss[0] - 'A' + 1, ss[1] - '0');
+				else sum -= get_value(ss[0] - 'A' + 1, ss[1] - '0');
+			}
+			else {
+				if (zheng) sum += to_int(ss);
+				else sum -= to_int(ss);
+			}
+			ss.clear();
+			zheng = false;
+			++k;
+			continue; 
+		}
+		else {
+			ss.push_back(s[k]);
+			++k;
+			continue;
+		}
+	}
+	if (!ss.empty()) {
+		if (isalpha(ss[0])) {
+			if (zheng) sum += get_value(ss[0] - 'A' + 1, ss[1] - '0');
+			else sum -= get_value(ss[0] - 'A' + 1, ss[1] - '0');
+		}
+		else {
+			if (zheng) sum += to_int(ss);
+			else sum -= to_int(ss);
+		}
+		ss.clear();
+	}
+	value[name] = sum;
+	return sum;
+}
+void assignment() {
+	for(int i=1;i<=r;++i)
+		for (int j = 0; j <= c-1; ++j) 
+			if (expression[i][j] != "" && has_value2[i][j]) {
+				get_value(i,j);
+			}
+}
+int get_int_value(string s) {
+	int size = s.size();
+	int k = 0;
+	int sum=0;
+	bool zheng = true;
+	string num;
+	while (k <= size - 1) {
+		if (s[k] == '+') {
+			if (k == 0) { ++k; continue; }
+			if (zheng) sum += to_int(num);
+			else sum -= to_int(num);
+			num.clear();
+			zheng = true;
+			++k;
+			continue;
+		}
+		else if (s[k] == '-') {
+			if (k == 0) { ++k; zheng = false; continue; }
+			if (zheng) sum += to_int(num);
+			else sum -= to_int(num);
+			num.clear();
+			zheng = false;
+			++k;
+			continue;
+		}
+		else {
+			num.push_back(s[k]);
+			++k;
+			continue;
+		}
+	}
+	if (!num.empty()) {
+		if (zheng) sum += to_int(num);
+		else sum -= to_int(num);
+	}
+	return sum;
+}
+int main() {
+	for (int i = 1; i <= 20; ++i)
+		for (int j = 0; j <= 9; ++j)
+			expression[i][j] = "";
+	while (true) {
+		cin >> r >> c;
+		if (r == 0)break;
+		string s;
+		for (int i = 1; i <= r; ++i)
+			for (int j = 0; j <= c-1; ++j) {
+				cin >> s;
+				if (!has_alpha(s)) {
+					string name;
+					name.push_back(letters[i]);
+					name.push_back(numbers[j]);
+					value[name] = get_int_value(s);
+					has_value[i][j] = 1; 
+				}
+				else {
+					expression[i][j] = s;
+					set<string> vec;
+					for (int k = 0; k <= s.size() - 2; ++k) {
+						if (isalpha(s[k])) {
+							G[i * 10 + j][(s[k] - 'A' + 1) * 10 + (s[k + 1] - '0')] = 1;
+							string name;
+							name.push_back(s[k]);
+							name.push_back(s[k + 1]);
+							vec.insert(name);
+							continue;
+						}
+						else continue;
+					}
+					children[i][j] = vec.size();
+				}
+			}
+		for (int i = 1; i <= r; ++i)
+			for (int j = 0; j <= c-1; ++j) {
+				if (has_value[i][j]) {
+					has_value2[i][j] = 1;
+					dfs(i, j);
+				}
+			}
+		assignment();
+		if (!has_circle()) {
+			cout << " ";
+			for (int j = 0; j <= c-1; ++j) cout << setw(6) << j;
+			cout << endl;
+			for (int i = 1; i <= r; ++i) {
+				cout << letters[i];
+				for (int j = 0; j <= c-1; ++j) {
+					string sss;
+					sss.push_back(letters[i]);
+					sss.push_back(numbers[j]);
+					cout << setw(6) << value[sss];
+				}
+				cout << endl;
+			}
+			cout << endl;
+		}
+		else {
+			for (int i = 1; i <= r; ++i)
+				for (int j = 0; j <= c-1; ++j) {
+					string s;
+					s.push_back(letters[i]);
+					s.push_back(numbers[j]);
+					if (value.count(s) == 0)cout << s << ": " << expression[i][j] << endl;
+				}
+			cout << endl;
+		}
+		value.clear();
+		for (int i = 1; i <= r; ++i)
+			for (int j = 0; j <= c-1; ++j) {
+				expression[i][j] = "";
+				has_value[i][j] = 0;
+				has_value2[i][j] = 0;
+				children[i][j] = 0;
+			}
+		memset(G, 0, sizeof(G));
+	}
+	return 0;
+}
