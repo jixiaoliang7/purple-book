@@ -1,0 +1,85 @@
+#include<cstdio>
+#include<cctype>
+#include<string>
+#include<vector>
+#include<iterator>
+#include<iostream>
+#include<algorithm>
+#include<sstream>
+#include<cstring>
+#include<queue>
+#include<iomanip>
+#include<map>
+#include<stack>
+#include<set>
+using namespace std;
+int V, E, T;
+int G[1005][1005];
+int existance[1005];
+int access[1005];
+vector<int> connects[1005];
+int number[1005];
+int length;
+void dfs(int i,int num) {
+	access[i] = -1;
+	existance[i] = 0;
+	connects[num].push_back(i);
+	for (int j = 1; j <= V; ++j) {
+		if (G[i][j] == 1 && access[j] == 0) {
+			dfs(j,num);
+		}
+	}
+	access[i] = 1;
+	return;
+}
+int connect_number() {
+	memset(access, 0, sizeof(access));
+	int num = 0;
+	for (int i = 1; i <= V - 1; ++i) {
+		if (existance[i]) {
+			++num;
+			dfs(i, num);
+		}
+	}
+	return num;
+}
+int calculate_length(int k) {
+	int singular = 0;
+	int sum = 0;
+	for (auto i : connects[k]) {
+		sum += number[i];
+		if (number[i] % 2 == 1) ++ singular;
+	}
+	sum /= 2;
+	if (singular <= 2) return sum;
+	else
+		return (sum + (singular-2) / 2);
+}
+int main() {
+	int cnt = 0;
+	while (true) {
+		++cnt;
+		cin >> V >> E >> T;
+		if (V == 0) break;
+		for (int i = 1; i <= E; ++i) {
+			int x = 0; int y = 0;
+			cin >> x >> y;
+			G[x][y] = G[y][x] = 1;
+			existance[x] = existance[y] = 1;
+			++number[x];
+			++number[y];
+		}
+		int num_connect = connect_number();
+		length = 0;
+		for (int i = 1; i <= num_connect; ++i) {
+			length += calculate_length(i);
+			if(i!=1)++length;
+		}
+		cout << "Case " << cnt << ": " << length*T << endl;
+		memset(G, 0, sizeof(G));
+		memset(existance, 0, sizeof(existance));
+		memset(number, 0, sizeof(number));
+		for (int i = 1; i <= num_connect; ++i) connects[i].clear();
+	}
+	return 0;
+}
