@@ -1,0 +1,90 @@
+#include<cstdio>
+#include<cctype>
+#include<string>
+#include<vector>
+#include<iterator>
+#include<iostream>
+#include<algorithm>
+#include<sstream>
+#include<cstring>
+#include<queue>
+#include<map>
+#include<stack>
+#include<set>
+using namespace std;
+long long tree[1 << 18];
+long long idxs[1 << 18];
+long long cnt;
+map<long long, int> map0;
+long long get_number(string s) {
+	if (s == "") return 0;
+	long long num = 0;
+	for (auto c : s) num = num * 10 + (c - '0');
+	return num;
+}
+void read_input() {
+	long long idx = 1;
+	cnt = 1;
+	string s;
+	char c;
+	while (true) {
+		c = getchar();
+		if (c == '\n') {
+			if (!s.empty()) {
+				long long k = get_number(s); tree[idx] = k; idxs[cnt] = idx;  ++cnt; s.clear();
+			} 
+			break;
+		}
+		else if (c == '[')idx *= 2;
+		else if (isdigit(c)) s.push_back(c);
+		else if (c == ',') { 
+			if (!s.empty()) {
+				long long k = get_number(s); tree[idx] = k; idxs[cnt] = idx; ++cnt; s.clear();
+			}
+			idx++; 
+		}
+		else if (c == ']') {
+			if (!s.empty()) {
+				long long k = get_number(s); tree[idx] = k; idxs[cnt] = idx; ++cnt; s.clear();
+			}
+			idx /= 2; 
+		}
+	}
+}
+int depth(int k) {
+	int level = 0;
+	while (k != 0) {
+		++level;
+		k /= 2;
+	}
+	return level-1;
+}
+long long power(int a, int m) {
+	long sum = 1;
+	for (int i = 1; i <= m; ++i) sum *= a;
+	return sum;
+}
+int main() {
+	int T;
+	cin >> T;
+	char c;
+	c = getchar();
+	while (T--) {
+		read_input();
+		for (int i = 1; i <= cnt - 1; ++i) {
+			long long value = tree[idxs[i]];
+			long long deep = depth(idxs[i]);
+			long long weight = power(2, deep) * value;
+			map0[weight]++;
+		}
+		int biggest = 0;
+		for (auto dui : map0) {
+			if (dui.second > biggest) biggest = dui.second;
+		}
+		cout << cnt - biggest - 1 << endl;
+		map0.clear();
+		memset(tree, 0, sizeof(tree));
+		memset(idxs, 0, sizeof(idxs));
+	}
+	return 0;
+}
