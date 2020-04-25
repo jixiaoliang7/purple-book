@@ -1,0 +1,201 @@
+#include<cstdio>
+#include<cctype>
+#include<string>
+#include<vector>
+#include<iterator>
+#include<iostream>
+#include<algorithm>
+#include<sstream>
+#include<cstring>
+#include<queue>
+#include<iomanip>
+#include<map>
+#include<stack>
+#include<set>
+using namespace std;
+int n;
+int image[70][70];
+int level;
+int blacks[1 << 12];
+int cnt;
+vector<int> solution;
+char numbers[] = { '0','1','2','3','4','5','6','7','8','9' };
+string to_string_num(int k) { //得到的string是反的
+	string s;
+	while (k != 0) {
+		s.push_back(numbers[k % 10]);
+		k /= 10;
+	}
+	return s;
+}
+int power(int a, int m) {
+	int result = 1;
+	for (int i = 1; i <= m; ++i) result *= a;
+	return result;
+}
+int five_to_ten(int k) {
+	int sum = 0;
+	int five = 1;
+	while (k != 0) {
+		sum += (k % 10) * five;
+		k /= 10;
+		five *= 5;
+	}
+	return sum;
+}
+int ten_to_five(int k) {
+	int sum = 0;
+	int ten = 1;
+	int five = 5;
+	while (k*5 >=five) {
+		sum += ((k % five) / (five/5)) * ten;
+		five *= 5;
+		ten *= 10; 
+	}
+	return sum;
+}
+int length(int k) {//接收5进制10进制皆可
+	if (k == 0) return 1;
+	int len = 0;
+	while (k != 0) {
+		k /= 10;
+		++len;
+	}
+	return len;
+}
+int get_child(int k, int pattern) {//接收5进制,输出5进制
+	return k + pattern * power(10, length(k));
+}
+vector<int> get_children(int k){ //接收10进制，输出包含4个五进制的vector
+	if (k == 0) return{ 1,2,3,4 };
+	k = ten_to_five(k);
+	vector<int> vec;
+	int len = length(k);
+	for (int i = 1; i <= 4; ++i) {
+		vec.push_back(k + i * power(10, len));
+	}
+	return vec;
+}
+int get_father(int k) {//k是5进制
+	int len = length(k);
+	if (k < 10) return 0;
+	return k % (power(10, len-1));
+}
+int color(int r, int c, int size) {
+	int white = 0;
+	int black = 0;
+	for(int i=r;i<=r+size-1;++i)
+		for (int j = c; j <= c + size - 1; ++j) {
+			if (image[i][j] == 1) ++black;
+			else ++white;
+			if (black!=0 && white!=0) return -1;
+		}
+	if (black!=0) return 1;
+	else return 0;
+}
+vector<int> get_position(int k) {//k是10进制下的
+	k = ten_to_five(k); //转换为5进制
+	if (k == 0) return{ 1,1,n };
+	string num = to_string_num(k);
+	int size = n;
+	int r = 1;
+	int c = 1;
+	for (auto ch : num) {
+		if (ch == '1') { size /= 2; }
+		else if (ch == '2') {
+			c += (size / 2);
+			size /= 2;
+		}
+		else if (ch == '3') {
+			r += (size / 2);
+			size /= 2;
+		}
+		else {
+			r += (size / 2);
+			c += (size / 2);
+			size /= 2;
+		}
+	}
+	return { r,c,size };
+}
+void paint(int r, int c, int size) {
+	for (int i = r; i <= r + size - 1; ++i)
+		for (int j = c; j <= c + size - 1; ++j)
+			image[i][j] = 1;
+}
+void read_input_1() {
+	getchar();
+	for (int i = 0; i <= 6; ++i)if (1 << i == n) level = i;
+	for (int i = 1; i <= n; ++i) {
+		for (int j = 1; j <= n; ++j)
+			image[i][j] = getchar() - '0';
+		getchar();
+	}
+}
+void read_input_2() {
+	int count = 1;
+	while (true) {
+		cin >> blacks[count];
+		if (blacks[count] == -1) break;
+		++count;
+	}
+}
+void dfs(int idx) {//10进制
+	vector<int> vec = get_position(idx);
+	int yanse = color(vec[0], vec[1], vec[2]);
+	if (yanse == -1) {
+		vector<int> children = get_children(idx);
+		for (int i = 0; i < 4; ++i) dfs(five_to_ten(children[i]));
+	}
+	else if (yanse == 1) {
+		solution.push_back(idx);
+	}
+}
+void convert_1() {
+	read_input_1();
+	dfs(0);
+	sort(solution.begin(), solution.end());
+	cout << "Image " << cnt << endl;
+	int count = 1;
+	for (auto a : solution) {
+		if (count == 13) {
+			count = 1;
+			cout << endl;
+		}
+		if (count == 1)cout << a;
+		else cout << " " << a;
+		++count;
+		}
+	if(solution.size()!=0) cout << endl;
+	cout << "Total number of black nodes = " << solution.size() << endl;
+	solution.clear();
+	memset(image, 0, sizeof(image));
+}
+void convert_2() {
+	read_input_2();
+	for (int i = 1; blacks[i] != -1; ++i) {
+		vector<int> coordinate = get_position(blacks[i]);
+		paint(coordinate[0], coordinate[1], coordinate[2]);
+	}
+	cout << "Image " << cnt << endl;
+	for (int i = 1; i <= n; ++i) {
+		for (int j = 1; j <= n; ++j) {
+			if (image[i][j] == 1) cout << '*';
+			else cout << '.';
+		}
+		cout << endl;
+	}
+	memset(blacks, 0, sizeof(blacks));
+	memset(image, 0, sizeof(image));
+}
+int main() {
+	while (true) {
+		++cnt;
+		cin >> n;
+		if (n == 0) break;
+		if(cnt!=1)cout << endl;
+		if (n > 0)convert_1();
+		else { n = -n; convert_2(); }
+	}
+	return 0;
+}
