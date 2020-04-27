@@ -1,0 +1,30 @@
+#include<cstdio>
+#include<cctype>
+#include<string>
+#include<vector>
+#include<iterator>
+#include<iostream>
+#include<algorithm>
+#include<sstream>
+#include<cstring>
+#include<queue>
+#include<map>
+#include<stack>
+#include<set>
+using namespace std;
+int k;
+vector<vector<int> > vec;
+int main() {
+	while (cin >> k) {
+		for (int y = k + 1; y <= 2 * k; ++y) {
+			if ((y * k) % (y - k) != 0) continue;
+			int x = (y * k) / (y - k);
+			if (x < y) continue;
+			vec.push_back({ x,y });
+		}
+		cout << vec.size() << endl;
+		for (auto v : vec) cout << "1/" << k << " = " << "1/" << v[0] << " + " << "1/" << v[1] << endl;
+		vec.clear();
+	}
+	return 0;
+}
