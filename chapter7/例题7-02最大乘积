@@ -1,0 +1,36 @@
+#include<cstdio>
+#include<cctype>
+#include<string>
+#include<vector>
+#include<iterator>
+#include<iostream>
+#include<algorithm>
+#include<sstream>
+#include<cstring>
+#include<queue>
+#include<map>
+#include<stack>
+#include<set>
+using namespace std;
+int n;
+long long S[20];
+int main() {
+	int cnt = 0;
+	while (cin>>n) {
+		++cnt;
+		for (int i = 1; i <= n; ++i)cin >> S[i];
+		long long maximum = S[1];
+		for (int i = 1; i <= n; ++i) {
+			long long product = S[i];
+			maximum = max(product, maximum);
+			for (int j = i + 1; j <= n; ++j) {
+				product *= S[j];
+				maximum = max(product, maximum);
+			}
+		}
+		if (maximum <= 0) cout << "Case #"<<cnt<<": The maximum product is "<< 0 <<'.'<<endl;
+		else cout << "Case #" << cnt << ": The maximum product is " << maximum << '.'<<endl;
+		cout << endl;
+	}
+	return 0;
+}
