@@ -1,0 +1,77 @@
+#include<cstdio>
+#include<cctype>
+#include<string>
+#include<vector>
+#include<iterator>
+#include<iostream>
+#include<algorithm>
+#include<sstream>
+#include<cstring>
+#include<queue>
+#include<map>
+#include<stack>
+#include<set>
+using namespace std;
+int n,L,cnt;
+string s;
+char alphabet[] = { '0','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z' };
+bool valid() {
+	int size = s.size();
+	bool answer = true;
+	for (int length = 1; length <= size / 2; ++length) {
+		answer = true;
+		for (int k = size - 1; k >= size - length ; --k) {
+			if (s[k] != s[k - length]) { answer = false; break; }
+		}
+		if (answer == false) continue;
+		else return false;
+	}
+	return true;
+}
+void output() {
+	int size = s.size();
+	if (size <= 64) {
+		for (int i = 0; i <= size - 1; ++i) {
+			if (i != 0 && i % 4 == 0) cout << " ";
+			cout << s[i];
+		}
+		cout << endl;
+		cout << size << endl;
+	}
+	else {
+		for (int i = 0; i <= size - 1; ++i) {
+			if (i != 0 && i % 4 == 0 && i != 64) cout << " ";
+			if (i == 64) cout << endl;
+			cout << s[i];
+		}
+		cout << endl;
+		cout <<size << endl;
+	}
+}
+bool dfs(int cur) {
+	++cnt;
+	if (cnt == n+1) {
+		output();
+		return false;
+	}
+	for (int i = 1; i <= L; ++i) {
+		s.push_back(alphabet[i]);
+		if (valid()) {
+			if (!dfs(cur + 1)) {
+				return false;
+			}
+			s.pop_back();
+		}
+		else { s.pop_back(); continue; }
+	}
+	return true;
+}
+int main() {
+	while (cin >> n >> L) {
+		if (n == 0) break;
+		cnt = 0;
+		s.clear();
+		dfs(0);
+	}
+	return 0;
+}
