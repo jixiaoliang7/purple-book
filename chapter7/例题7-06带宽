@@ -1,0 +1,100 @@
+#include<cstdio>
+#include<cctype>
+#include<string>
+#include<vector>
+#include<iterator>
+#include<iostream>
+#include<algorithm>
+#include<sstream>
+#include<cstring>
+#include<queue>
+#include<map>
+#include<stack>
+#include<set>
+using namespace std;
+int G[10][10];
+int value[10];
+int width[10];
+set<char> alpha;
+map<int, char> name;
+map<char, int> indx;
+string s;
+int bandwidth;
+int n;
+int access[10];
+vector<int> solution;
+bool read_input() {
+	getline(cin, s);
+	if (s == "#") return false;
+	for (auto c : s) if (isalpha(c))alpha.insert(c);
+	int idx = 1;
+	n = alpha.size();
+	for (auto c : alpha) { name[idx] = c; indx[c] = idx; ++idx; }
+	int size = s.size() - 1;
+	idx = 0;
+	while (idx <= size) {
+		char c = s[idx];
+		idx += 2;
+		while (s[idx] != ';' && idx <= size) {
+			G[indx[c]][indx[s[idx]]] = 1;
+			G[indx[s[idx]]][indx[c]] = 1;
+			++idx;
+		}
+		++idx;
+		continue;
+	}
+	return true;
+}
+bool prune(int cur) {
+	if (cur == 1) return true;
+	int k = value[cur];
+	for (int i = 1; i <= cur - 1; ++i)
+		if (G[k][value[i]] && abs(cur - i) >= bandwidth) return false;
+	int m=0;
+	for (int i = 1; i <= n; ++i)
+		if (access[i] == 0 && G[k][i])++m;
+	if (m >= bandwidth) return false;
+	return true;
+}
+void dfs(int cur) {
+	if (cur == n + 1) { 
+		for (int i = 1; i <= n; ++i) {
+			int wide = 0;
+			for (int j = 1; j <= n; ++j)
+				if (G[value[i]][value[j]]) wide = max(wide, abs(i - j));
+			width[i] = wide;
+			if (width[i] >= bandwidth) return;
+		}
+		int max_width = width[1];
+		for (int i = 2; i <= n; ++i) max_width = max(max_width, width[i]);
+		bandwidth = max_width;
+		solution.clear();
+		for (int i = 1; i <= n; ++i) solution.push_back(value[i]);
+		return; 
+	}
+	for(int i=1;i<=n;++i)
+		if (access[i] == 0) {
+			value[cur] = i;
+			access[i] = 1;
+			if (prune(cur)) dfs(cur + 1);
+			access[i] = 0;
+		}
+
+}
+void output() {
+	for (auto k : solution) cout << name[k] << " ";
+	cout << "-> " << bandwidth << endl;
+}
+int main() {
+	while(true) {
+		if (!read_input()) break;
+		bandwidth = 10;
+		dfs(1);
+		output();
+		memset(G, 0, sizeof(G));
+		alpha.clear();
+		name.clear();
+		indx.clear();
+	}
+	return 0;
+}
